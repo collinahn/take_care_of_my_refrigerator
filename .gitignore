@@ -161,5 +161,5 @@ cython_debug/
 
 
 # classified files
-__*
-__*/
+__classified
+__classified/
