@@ -23,6 +23,7 @@ CRITICAL    심각한 문제가 발생해서 도저히 시스템이 정상적으
 # 2022.10.21. modified - add watchedfilehandler 
 # (리눅스에서 멀티프로세스로 동작하는 프로그램의 로그 파일 포인터가 업데이트되지 않아 정상적으로 로그가 출력되지 않는 문제 해결)
 
+import os
 import logging
 from logging import Formatter
 from logging.handlers import RotatingFileHandler, WatchedFileHandler
@@ -30,6 +31,10 @@ from logging.handlers import RotatingFileHandler, WatchedFileHandler
 
 class WatchedRotatingFileHandler(RotatingFileHandler, WatchedFileHandler):
     def __init__(self, filename, mode='a', maxBytes=0, backupCount=0, encoding=None, delay=False):
+        # create .log.server directory if not exists
+        if not os.path.exists(os.path.dirname(filename)):
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
+            
         RotatingFileHandler.__init__(self, filename=filename, mode='a', maxBytes=maxBytes,
                                      backupCount=backupCount, encoding=encoding, delay=delay)
         self.dev, self.ino = -1, -1
