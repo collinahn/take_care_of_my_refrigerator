@@ -1,14 +1,14 @@
 import platform
 from pymongo import MongoClient
 
-from __classified.mongodb import IP as MONGO_IP, USERNAME as MONGODB_USERNAME, PASSWD as MONGO_PASSWD
+from __classified.mongodb import IP as MONGO_IP, PORT as MONGO_PORT,USERNAME as MONGODB_USERNAME, PASSWD as MONGO_PASSWD
 
 
 class MongoAccess:
     if platform.system() in ['Linux']:
-        uri = 'mongodb://localhost:27017/crwlnoti'
+        uri = f'mongodb://{MONGODB_USERNAME}:{MONGO_PASSWD}@localhost:27017/refrigerator'
     else:
-        uri = f'mongodb://{MONGODB_USERNAME}:{MONGO_PASSWD}@{MONGO_IP}:27017/?replicaSet=CrwlnotiDb'
+        uri = f'mongodb://{MONGODB_USERNAME}:{MONGO_PASSWD}@{MONGO_IP}:{MONGO_PORT}/refrigerator'
     port = None
 
     @classmethod
