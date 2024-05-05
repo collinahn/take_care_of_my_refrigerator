@@ -32,14 +32,25 @@ def home():
     server_log.info(log_visitor_msg())
     return render_template('home.html'), 200
 
+@bp_main.get('/search/')
+def search():
+    server_log.info(log_visitor_msg())
+    return render_template('search.html'), 200
+
+@bp_main.get('/recipe/<recipe_id>/')
+def recipe(recipe_id):
+    server_log.info(log_visitor_msg())
+    return render_template('recipe.html'), 200
+
+@bp_main.get('/refrigerator/')
+def refrigerator():
+    server_log.info(log_visitor_msg())
+    return render_template('refrigerator.html'), 200
 
 @bp_main.get('/settings/')
 def push_settings():
     server_log.info(log_visitor_msg())
-
     return render_template('push_settings.html'), 200
-
-
 
 @bp_main.get('/sitemap.xml')
 def main_sitemap():
@@ -48,7 +59,6 @@ def main_sitemap():
     response = make_response(xml)
     response.headers['Content-Type'] = 'application/xml'
     return response
-
 
 
 if __name__ == '__main__':
