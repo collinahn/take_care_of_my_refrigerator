@@ -47,14 +47,16 @@ def create_app():
     from views.main.main import bp_main
     app.register_blueprint(bp_main)
     
-    from views.api.recipe import bp_recommend
+    from views.api.recipe import bp_recipe
     from views.api.register import bp_register
     from views.api.refrigerator import bp_refrigerator
     from views.api.user import bp_user
-    app.register_blueprint(bp_recommend)
+    from views.api.search import bp_search
+    app.register_blueprint(bp_recipe)
     app.register_blueprint(bp_register)
     app.register_blueprint(bp_refrigerator)
     app.register_blueprint(bp_user)
+    app.register_blueprint(bp_search)
 
     return app
 

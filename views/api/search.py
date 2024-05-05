@@ -10,6 +10,6 @@ from utils.response import incorrect_data_response, server_error, success_respon
 from tasks.push.worker import send_push_notification
 from utils.logger import get_logger
 
-bp_refrigerator = Blueprint('search', __name__, url_prefix='/api/search')
+bp_search = Blueprint('search', __name__, url_prefix='/api/search')
 log = get_logger()
 

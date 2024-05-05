@@ -12,7 +12,7 @@ from pymongo.errors import PyMongoError
 from pymongo.collection import Collection
 
 from tasks.push.worker import send_push_notification
-from db.mongo import db_push, db_users
+from db.mongo import  db_users
 from db.redis import redis_client
 
 from utils.logger import get_logger
@@ -132,5 +132,5 @@ def send_unified_push_msg_to_users(users: list[dict], push_msg_as_dict: dict):
     push_msg_as_dict |= {'time': time.time()}
     bulk_write_ids = [user.get('_id') for user in users]
     bulk_write_to_collection(
-        db_push['pwa'], [updatemany_push_history(bulk_write_ids, push_msg_as_dict)])
+        db_users['pwa'], [updatemany_push_history(bulk_write_ids, push_msg_as_dict)])
 
