@@ -18,7 +18,6 @@ def user_push_settings():
     '''
     푸시 설정을 가져온다
     params
-    lang = kr
     endpoint="https://web.push.apple.com/QE9XB6RaTxzL3bkxqQxhBXapVFNFc-xUGzw4YjqgewFcue8xvGQhVPzTREddvGyvvXTzlZJeJ7131Zaqixp8VAQd15ab4LygRBbTPdfvIvlWjEswkfqEsmByD_1eu_zrZC5gaEh1f1NZ9Mp3NVLxPVG1BxDSwVPk6zDawTecPRw"
     '''
     if 'endpoint' not in request.args:
@@ -31,7 +30,6 @@ def user_push_settings():
             },
             {
                 'device': 0,
-                'restricted': 0,
                 'sub': 0
             })
 
@@ -46,3 +44,37 @@ def user_push_settings():
         '성공',
         data=_push_settings,
     )
+
+
+@bp_user.post('/settings/<settings_key>/')
+def set_user_preference(settings_key: str):
+    '''
+    개인 선호 설정을 저장한다
+    request body
+    endpoint:"https://web.push.apple.com/QE9XB6RaTxzL3bkxqQxhBXapVFNFc-xUGzw4YjqgewFcue8xvGQhVPzTREddvGyvvXTzlZJeJ7131Zaqixp8VAQd15ab4LygRBbTPdfvIvlWjEswkfqEsmByD_1eu_zrZC5gaEh1f1NZ9Mp3NVLxPVG1BxDSwVPk6zDawTecPRw"
+    <settings_key>: data
+    '''
+    
+    request_body =  request.get_json(silent=True) or {}
+    if request_body.get('endpoint') is None:
+        return incorrect_data_response('wrong request'), 400
+    
+    try:
+        updated_res = db_users['pwa'].update_one(
+            {
+                'endpoint': request_body['endpoint']
+            },
+            {
+                '$set': {
+                    settings_key: request_body.get(request_body.get('data'))
+                }
+            }
+        )
+    except PyMongoError as pe:
+        log.error(pe)
+        return server_error('잠시 후 다시 이용해주세요'), 500
+
+    if updated_res.modified_count == 0:
+        return incorrect_data_response('변경 사항이 없습니다.'), 400 
+    
+    return success_response('성공')
