@@ -24,11 +24,15 @@ def user_push_settings():
         return incorrect_data_response('wrong request'), 400
     
     try:
-        _push_settings: dict = db_users['pwa'].find_one(
+        _push_settings: dict = db_users.find_one(
             {
-                'endpoint': request.args.get('endpoint')    
+                'sub.endpoint': request.args.get('endpoint')    
             },
             {
+                'first_reg':0,
+                'last_called': 0,
+                'success_cnt': 0,
+                'use': 0,
                 'device': 0,
                 'sub': 0
             })
@@ -60,7 +64,7 @@ def set_user_preference(settings_key: str):
         return incorrect_data_response('wrong request'), 400
     
     try:
-        updated_res = db_users['pwa'].update_one(
+        updated_res = db_users.update_one(
             {
                 'endpoint': request_body['endpoint']
             },

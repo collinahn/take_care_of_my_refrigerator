@@ -46,7 +46,7 @@ def send_push_notification(subscription_info: dict, message: dict):
                     '$set': {'use': False}
                 }
         with MongoAccess.get_client(server_selection_ms=7000) as mongoclient:
-            mongoclient['users']['pwa'].update_one(
+            mongoclient['refrigerator']['user'].update_one(
                 {'_id': noti_id}, update_query)
 
         if '410 Gone' not in repr(ex):

@@ -163,3 +163,5 @@ cython_debug/
 # classified files
 __classified
 __classified/
+
+.DS_Store

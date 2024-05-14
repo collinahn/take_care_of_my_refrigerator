@@ -158,14 +158,657 @@
 
 
         <link rel="stylesheet" href="/css/home.css" />
+        <link rel="stylesheet" href="/css/bottom_sheet.css" />
 
 
     </head>
 
     <body>
+        <script id="base-unit">
+            const getOS = () => {
+                let userAgent = window.navigator?.userAgent,
+                    platform = window.navigator?.platform,
+                    macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+                    windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+                    iosPlatforms = ['iPhone', 'iPad', 'iPod']
+
+                if (macosPlatforms.indexOf(platform) !== -1) {
+                    return 'mac';
+                } else if (iosPlatforms.indexOf(platform) !== -1) {
+                    return 'iphone';
+                } else if (windowsPlatforms.indexOf(platform) !== -1) {
+                    return 'win';
+                } else if (/Android/.test(userAgent)) {
+                    return 'android';
+                } else if (!os && /Linux/.test(platform)) {
+                    return 'linux';
+                }
+                return '';
+            }
+
+            const userOS = getOS();
+
+            const createElementWithClass = (
+                tagName,
+                classNameList,
+                textString,
+                htmlString
+            ) => {
+                let nodeElement = document.createElement(tagName);
+                if (classNameList) {
+                    nodeElement.classList.add(...classNameList);
+                }
+                if (textString) {
+                    nodeElement.innerText = textString;
+                }
+                if (htmlString) {
+                    nodeElement.innerHTML = htmlString.toString().replaceAll("\n", "<br>");
+                }
+                return nodeElement;
+            };
+
+            const createElementWithClassV2 = (
+                tagName,
+                classNameList,
+                attributes,
+                datasets,
+                children
+            ) => {
+                let nodeElement = document.createElement(tagName);
+                if (classNameList) {
+                    nodeElement.classList.add(...classNameList);
+                }
+                if (attributes) {
+                    Object.entries(attributes).forEach(([attr, value]) => {
+                        switch (attr) {
+                            case "innerHtml": {
+                                nodeElement.innerHTML = value;
+                                break;
+                            }
+                            case "innerHTML": {
+                                nodeElement.innerHTML = value;
+                                break;
+                            }
+                            case "innerText": {
+                                nodeElement.innerText = value;
+                                break;
+                            }
+                            case "onclick": {
+                                nodeElement.onclick = value;
+                                break;
+                            }
+                            case "onchange": {
+                                nodeElement.onchange = value;
+                                break;
+                            }
+                            case "onscroll": {
+                                nodeElement.onscroll = value;
+                                break;
+                            }
+                            case "onmouseover": {
+                                nodeElement.onmouseover = value;
+                                break;
+                            }
+                            case "onmousemove": {
+                                nodeElement.onmousemove = value;
+                                break;
+                            }
+                            case "onmouseout": {
+                                nodeElement.onmouseout = value;
+                                break;
+                            }
+                            case "onsubmit": {
+                                nodeElement.onsubmit = value;
+                                break;
+                            }
+                            case "oninput": {
+                                nodeElement.oninput = value;
+                                break;
+                            }
+                            case "ontransitionend": {
+                                nodeElement.ontransitionend = value;
+                                break;
+                            }
+                            case "onwheel": {
+                                nodeElement.onwheel = value;
+                                break;
+                            }
+                            case "checked": {
+                                nodeElement.checked = value;
+                                break;
+                            }
+                            case "value": {
+                                nodeElement.value = value;
+                                break;
+                            }
+                            case "style": {
+                                Object.entries(value).forEach(([cssAttr, value]) => {
+                                    nodeElement.style.setProperty(cssAttr, value);
+                                });
+                                break;
+                            }
+                            case "dataset": {
+                                Object.entries(value).forEach(([attr, value]) => {
+                                    nodeElement.setAttribute(`data-${attr}`, value);
+                                });
+                                break;
+                            }
+                            case "class": {
+                                nodeElement.classList.add(...value);
+                                break;
+                            }
+                            default:
+                                nodeElement.setAttribute(attr, value);
+                        }
+                    });
+                }
+                if (datasets) {
+                    Object.entries(datasets).forEach(([attr, value]) => {
+                        nodeElement.setAttribute(`data-${attr}`, value);
+                    });
+                }
+                if (children) {
+                    children.forEach((el) => nodeElement.appendChild(el));
+                }
+                return nodeElement;
+            };
+            const removeFadeOut = (element) => {
+                element.classList.add("slow-opacity-trans");
+                element.style.opacity = 0;
+                element.style.transform = "translateX(-15px) scale(0.8)";
+                element.ontransitionend = (e) => {
+                    e.target.parentNode?.removeChild(e.target)
+                    e.target.classList.remove("slow-opacity-trans")
+                };
+            };
+            const removeFadeOutImmediately = (element) => {
+                element.classList.add("medium-opacity-trans");
+                element.style.transform = "translateY(-15px)";
+                element.style.opacity = 0;
+                element.ontransitionend = (e) => {
+                    e.target.parentNode?.removeChild(e.target)
+                    e.target.classList.remove("medium-opacity-trans")
+                };
+            };
+            const removeMatchingMsg = (id) => {
+                const ID_SEPARATOR = "-";
+                const idSplited = id.split(ID_SEPARATOR);
+                const idNo = idSplited.at(-1);
+                const selector = id.split(ID_SEPARATOR).at(0);
+                if (idNo === "0" || idSplited.length === 1) {
+                    const selectionStr = "[id ^= '" + selector + "']";
+                    const previousMsgs = document
+                        .getElementById("myref_alert")
+                        .querySelectorAll(selectionStr);
+                    previousMsgs.forEach((prevElement) =>
+                        removeFadeOutImmediately(prevElement)
+                    );
+                }
+            };
+            const appendFadeIn = (parentEl, targetEl, id) => {
+                if (id) {
+                    removeMatchingMsg(id);
+                }
+                targetEl.classList.add("fast-opacity-trans");
+                parentEl.appendChild(targetEl).focus();
+                setTimeout(() => {
+                    targetEl.style.opacity = 1;
+                    targetEl.style.transform = "none";
+                    targetEl.ontransitionend = (e) =>
+                        e.target.classList.remove("fast-opacity-trans");
+                }, 30);
+            };
+            const promptAlertMsg = (
+                type,
+                msg,
+                anchor,
+                categoryReplaceWithoutRefresh,
+                id
+            ) => {
+                const maxAlertMsgStack = 5;
+                const disappearTimeInMilisec = 7000;
+                const poppupArea = document.getElementById("myref_alert");
+                if (poppupArea.childElementCount >= maxAlertMsgStack) {
+                    removeFadeOutImmediately(poppupArea.firstElementChild);
+                }
+
+                const singleAlertMsg = createElementWithClass("div", ["msg", type]);
+                if (anchor) {
+                    const aLinkMsg = createElementWithClass("a", null, msg);
+                    aLinkMsg.href = anchor;
+                    const spanArea = createElementWithClass("span", ["text"]);
+                    spanArea.appendChild(aLinkMsg);
+                    singleAlertMsg.appendChild(spanArea);
+                } else {
+                    const textMsg = createElementWithClass("span", ["text"], null, msg);
+                    singleAlertMsg.appendChild(textMsg);
+                    if (categoryReplaceWithoutRefresh) {
+                        const scrollToSelectedOptionAfterDelay = (delay) =>
+                            document
+                                .getElementById("header-row2")
+                                .querySelectorAll("input")
+                                .forEach((elem) => {
+                                    if (elem.id == getCurrentCategoryFromParams()) {
+                                        elem.checked = true;
+                                        scrollToSelectedCategoryWithDelay(delay || 500);
+                                    }
+                                });
+                        singleAlertMsg.style.textDecoration = "underline";
+                        singleAlertMsg.onclick = () => {
+                            window.history.replaceState(
+                                null,
+                                null,
+                                `?${new URLSearchParams({
+                                    category: categoryReplaceWithoutRefresh,
+                                })}`
+                            );
+                            renderProdListScrollTop();
+                            scrollToSelectedOptionAfterDelay();
+                        };
+                    }
+                }
+                if (id) {
+                    singleAlertMsg.id = id;
+                }
+                appendFadeIn(poppupArea, singleAlertMsg, id);
+                setTimeout(() => {
+                    removeFadeOut(singleAlertMsg);
+                }, disappearTimeInMilisec);
+            };
+
+        </script>
+
+        <script>
+            const USER_ID_PUSH = "REFRIGERATOR_PUSH_ID"
+            const USER_ID_PUSH_REF = "REFRIGERATOR_PUSH_ID_REF"
+            const ENDPOINT_PUSH_REF = "REFRIGERATOR_PUSH_ENDPOINT"
+            const REGISTER_DEVICE_URL = "https://myrefrigerator.store/api/register/"
+            const DEVICE_PUSH_SETTINGS_URL = "https://myrefrigerator.store/api/user/settings/"
+            const isBoolean = (val) => val === true || val === false;
+            const isNum = (val) => typeof val === "number";
+            const isObj = (val) => val?.constructor.name === "Object";
+            const isEmptyObj = (val) => Object.keys(val).length === 0 && val.constructor === Object;
+            const isNotificationGranted = () => Notification?.permission === "granted";
+            const isNotificationGrantedYet = () => Notification?.permission === "default";
+            const updateServiceWorker = () => navigator?.serviceWorker?.register("/service-worker.js", { scope: "/" });
+            const updateServiceWorkerIfGranted = () => isNotificationGranted() ? updateServiceWorker() : null;
+            const storeUserId = (userId) => window.localStorage.setItem(USER_ID_PUSH, userId)
+            const getUserId = () => window.localStorage.getItem(USER_ID_PUSH)
+            const isiOS = () => navigator.userAgent.match(/iPhone|iPad/i)
+            const formatTimeStampToDate = (pyTimeStamp) => new Intl.DateTimeFormat(navigator.language).format(new Date(pyTimeStamp * 1000))
+            const formatTimeStampToDateDetailed = (pyTimeStamp) => new Intl.DateTimeFormat(navigator.language, { dateStyle: "short", timeStyle: "medium" }).format(new Date(pyTimeStamp * 1000))
+            const formatTimeStampToRelativeDate = (pyTimeStamp) => {
+                const rtf1 = new Intl.RelativeTimeFormat(navigator.language, { style: 'short' });
+                const nowSecond = parseInt(new Date().getTime() / 1000)
+                if (nowSecond - pyTimeStamp < 60) {
+                    return rtf1.format(parseInt(-(nowSecond - pyTimeStamp)), "second")
+                }
+                else if (nowSecond - pyTimeStamp < 3600) {
+                    return rtf1.format(parseInt(-(nowSecond - pyTimeStamp) / 60), "minute")
+                }
+                else if (nowSecond - pyTimeStamp < 3600 * 24) {
+                    return rtf1.format(parseInt(-(nowSecond - pyTimeStamp) / 3600), "hour")
+                }
+                else if (nowSecond - pyTimeStamp < 3600 * 24 * 30) {
+                    return rtf1.format(parseInt(-(nowSecond - pyTimeStamp) / 3600 / 24), "day")
+                }
+                else if (nowSecond - pyTimeStamp < 3600 * 24 * 365) {
+                    return rtf1.format(parseInt(-(nowSecond - pyTimeStamp) / 3600 / 24 / 30), "month")
+                } else {
+                    return rtf1.format(parseInt(-(nowSecond - pyTimeStamp) / 3600 / 24 / 30 / 365), "year")
+                }
+            }
+            const formatNumberToWon = (amount, currencySuffix = "원") => {
+                return new Intl.NumberFormat(navigator.language).format(amount) + (currencySuffix || "");
+            };
+            const formatNumberToWonLoose = (amount, currencySuffix = "원") => {
+                return (
+                    new Intl.NumberFormat(navigator.language, {
+                        notation: "compact",
+                    }).format(amount) + (currencySuffix || "")
+                );
+            };
+            const encryptRefStore = (text) => {
+                var result = '';
+                for (var i = 0; i < text.length; i++) {
+                    var charCode = text.charCodeAt(i) ^ USER_ID_PUSH_REF.charCodeAt(i % USER_ID_PUSH_REF.length);
+                    result += String.fromCharCode(charCode);
+                }
+                return result;
+            }
+            const decryptRefStore = (text) => encryptRefStore(text) // XOR encryption is symmetric
+            const getSubscriptionEndpoint = async () => {
+                if (!navigator?.serviceWorker?.controller) {
+                    return "";
+                }
+                const service = await navigator?.serviceWorker?.ready;
+                if (!service) return "";
+
+                const pushSubs = await service?.pushManager?.getSubscription();
+                if (!pushSubs) return "";
+                return pushSubs?.endpoint || "";
+            };
+
+            const pushValidityCheck = () => {
+                const iOSCanInstall = "standalone" in window.navigator;
+                const iOSIsInstalled = window.navigator.standalone === true;
+                if (iOSCanInstall && !iOSIsInstalled) {
+                    throw new Error("iOS 기기 제한사항\n\niOS 정책으로 인해 iOS 16.4 이상 버전에서 홈 화면에 추가된 이후 푸시 알림 수신이 가능합니다.\n\n사파리에서 공유하기 -> 홈 화면 추가 버튼을 눌러 현재 페이지를 홈 화면에 추가하시고 추가된 앱을 통해 다시 돌아와주세요.")
+                }
+
+                if (!('Notification' in window) || !Notification?.requestPermission) throw new Error("지원하지 않는 브라우저입니다.\n기기의 브라우저에서 직접 열어주세요\nERRCODE=NT-1")
+                if (!('serviceWorker' in navigator)) throw new Error("지원하지 않는 브라우저입니다. ERRCODE=SW-1")
+                if (!('PushManager' in window)) throw new Error("지원하지 않는 브라우저입니다. ERRCODE=PM-1")
+
+            }
+
+            // REGISTER SERVICE WORKER
+            async function regWorkerToServer() {
+                updateServiceWorker()
+
+                // SUBSCRIBE TO PUSH SERVER
+                navigator.serviceWorker.ready
+                    .then(swreg => {
+                        if (swreg !== null) {
+                            try {
+                                swreg.pushManager.getSubscription().then(sub => {
+                                    if (sub == null) {
+                                        swreg.pushManager.subscribe({
+                                            userVisibleOnly: true,
+                                            applicationServerKey: "BNcpl8L7rwZvlk7BZC51ZNe0b8OKoZjuJ8LqR6acfDi6toBTdVtj28fi7nkzonYKi6cfn4BkwU-tYKwfMAcv8jw"
+                                        }).then(
+                                            // OK - TEST PUSH NOTIFICATION
+                                            sub => {
+                                                let data = new FormData();
+                                                data.append("sub", JSON.stringify(sub));
+                                                try {
+                                                    data.append("device", JSON.stringify({
+                                                        platform: getOS() || navigator?.userAgentData?.platform || navigator?.platform,
+                                                        lang: navigator?.language,
+                                                        cookieEnabled: navigator?.cookieEnabled,
+                                                        ua: navigator?.userAgent,
+                                                        timezone: Intl.DateTimeFormat()?.resolvedOptions()?.timeZone
+                                                    }))
+                                                }
+                                                catch (err) {
+                                                    data.append("device", JSON.stringify({
+                                                        platform: navigator?.userAgentData?.platform || navigator?.platform,
+                                                        ua: navigator?.userAgent,
+                                                        error: err
+                                                    }))
+                                                }
+                                                const previousData = window.localStorage.getItem(USER_ID_PUSH_REF)
+                                                const previousDataDecrypted = previousData ? decryptRefStore(previousData) : null
+                                                previousDataDecrypted ? data.append("previous", previousDataDecrypted) : null
+                                                fetch(REGISTER_DEVICE_URL, { method: "POST", body: data })
+                                                    .then(res => res.json())
+                                                    .catch(err => promptAlertMsg("warn", err, null, null, "server_err_msg"))
+                                                    .then(json => {
+                                                        promptAlertMsg("info", json.server_msg, null, null, "server_msg")
+                                                        json?.data?.identification ? window.localStorage.setItem(USER_ID_PUSH_REF, encryptRefStore(JSON.stringify(json.data.identification))) : null;
+                                                        window.localStorage.setItem(ENDPOINT_PUSH_REF, encryptRefStore(sub.endpoint))
+
+                                                        setupUserPreferenceSettings()
+                                                    })
+                                                    .catch(err => promptAlertMsg("warn", err, null, null, "server_err_msg"));
+                                            },
+                                            // (B3-2) ERROR!
+                                            err => promptAlertMsg("warn", err, null, null, "err_msg")
+                                        );
+                                    }
+                                    else {
+                                        let data = new FormData();
+                                        data.append("sub", JSON.stringify(sub));
+                                        try {
+                                            data.append("device", JSON.stringify({
+                                                platform: getOS() || navigator?.userAgentData?.platform || navigator?.platform,
+                                                lang: navigator?.language,
+                                                cookieEnabled: navigator?.cookieEnabled,
+                                                ua: navigator?.userAgent,
+                                                timezone: Intl.DateTimeFormat()?.resolvedOptions()?.timeZone
+                                            }))
+                                        }
+                                        catch (err) {
+                                            data.append("device", JSON.stringify({
+                                                platform: navigator?.userAgentData?.platform || navigator?.platform,
+                                                ua: navigator?.userAgent,
+                                                error: err
+                                            }))
+                                        }
+                                        const previousData = window.localStorage.getItem(USER_ID_PUSH_REF)
+                                        const previousDataDecrypted = previousData ? decryptRefStore(previousData) : null
+
+                                        const previousEndpoint = window.localStorage.getItem(ENDPOINT_PUSH_REF)
+                                        const previousEndpointDecrypted = previousEndpoint ? decryptRefStore(previousEndpoint) : null
+                                        if (previousEndpointDecrypted === sub.endpoint) {
+                                            console.log("Already registered, endpoint same")
+                                            return
+                                        }
+
+                                        previousDataDecrypted ? data.append("previous", previousDataDecrypted) : null
+                                        fetch(REGISTER_DEVICE_URL, { method: "POST", body: data })
+                                            .then(res => res.json())
+                                            .catch(err => promptAlertMsg("warn", err, null, null, "server_err_msg"))
+                                            .then(json => {
+                                                promptAlertMsg("info", json.server_msg, null, null, "server_msg")
+                                                json?.data?.identification ? window.localStorage.setItem(USER_ID_PUSH_REF, encryptRefStore(JSON.stringify(json.data.identification))) : null;
+                                                window.localStorage.setItem(ENDPOINT_PUSH_REF, encryptRefStore(sub.endpoint))
+                                                setupUserPreferenceSettings()
+                                            })
+                                            .catch(err => promptAlertMsg("warn", err, null, null, "server_err_msg"));
+                                    }
+
+                                })
+                            } catch (err) { alert(err) }
+                        } else { alert("지원되지 않는 브라우저입니다.") }
+                    });
+            }
+
+            const onClickGetPermission = () => {
+                try {
+                    pushValidityCheck()
+                } catch (err) {
+                    alert(err)
+                    return
+                }
+
+                Notification.requestPermission().then(perm => {
+                    if (isNotificationGranted() || isNotificationGrantedYet()) {
+                        regWorkerToServer().catch(err => promptAlertMsg("warn", "기기 정보 불러오기 실패", null, null, "error"));
+                    } else {
+                        alert("브라우저 설정해서 알림 허용을 체크해주세요.\n브라우저 정책상 권한 설정 허용 창은 최초 1회만 표시됩니다.");
+                    }
+                });
+            }
+
+            const postRequestSettingsChange = (bodyData, optionalTarget) => {
+                let apiUrl = "https://myrefrigerator.store/api/user/settings/"
+                if (optionalTarget) {
+                    apiUrl = `${apiUrl}${optionalTarget}/`
+                }
+                return fetch(apiUrl, {
+                    method: 'POST',
+                    body: JSON.stringify(bodyData),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+            }
+
+            const createExplainButton = (explainLabel) => {
+                const btnExplain = createElementWithClass("button", ["explain-btn"], "?");
+                btnExplain.type = "button"
+                btnExplain.onclick = (e) => promptAlertMsg("info", explainLabel, null, null, "explain_btn")
+                return btnExplain
+            }
+            const createInputCheckbox = (checkboxName, initialValue) => {
+                const inputChkBox = createElementWithClass("input", ["toggle-input"]);
+                inputChkBox.name = checkboxName
+                inputChkBox.type = "checkbox"
+                inputChkBox.checked = !!(initialValue)
+                inputChkBox.onchange = (e) => {
+                    const changedName = e.target.name;
+                    const changedValue = e.target.checked;
+                    const userId = document.getElementById("push-settings").dataset.userId
+
+                    if (checkboxName === "push_settings.push" && !e.target.checked) {
+                        if (!window.confirm("전체 알림을 받을 수 없게 됩니다.\n확인을 누르면 알림이 해제됩니다.")) {
+                            e.target.checked = true
+                            return
+                        }
+                    }
+
+                    postRequestSettingsChange({
+                        user: userId,
+                        type: "toggle",
+                        key: changedName,
+                        value: changedValue
+                    })
+                        .then((res) => res.json())
+                        .then((data) => {
+                            if (data.resp_code !== "RET000") {
+                                promptAlertMsg("warn", data.server_msg);
+                                return
+                            }
+                            const infoMsg = changedValue ? "알림이 설정되었습니다." : "알림이 해제되었습니다.";
+                            promptAlertMsg("info", infoMsg, null, null, "feedback")
+                        })
+                        .catch((err) => promptAlertMsg("warn", err, null, null, "error"))
+
+                }
+                return inputChkBox
+            }
+
+            const createToggleBtnBox = (key, labelName, isChecked, explainLabel) => {
+                const toggleBtnBox = createElementWithClass("div", ["toggle-setting-btn"]);
+                const labelChkbox = createElementWithClass("label", ["text-label"], isObj(labelName) ? labelName?._label : labelName)
+                labelChkbox.for = key
+                toggleBtnBox.appendChild(labelChkbox)
+
+                explainLabel ? labelChkbox.appendChild(createExplainButton(explainLabel)) : null
+
+                const inputChkBox = createInputCheckbox(key, isChecked)
+                toggleBtnBox.appendChild(inputChkBox)
+                return toggleBtnBox
+            }
+
+            const createSingleHistory = (pushData) => {
+                const pushUrl = pushData?.url
+                const baseUnit = createElementWithClass("div", ["notification-history"])
+                baseUnit.dataset.tag = pushData?.tag
+                baseUnit.dataset.time = pushData?.time
+
+
+                const titleTextArea = createElementWithClass("a", ["ahref"])
+                if (pushUrl) {
+                    titleTextArea.href = pushData.url
+                }
+
+                const titleImg = createElementWithClass("img", ["title-img"])
+                titleImg.src = pushData?.image || pushData.badge
+                titleImg.draggable = false
+                if (pushUrl) {
+                    titleImg.onclick = () => location.href = pushData.url
+                }
+                baseUnit.appendChild(titleImg)
+                baseUnit.appendChild(titleTextArea)
+
+                const ahrefTitle = createElementWithClass("div", ["text-label", "smaller", "text-right"])
+                const labelTitle = createElementWithClass("h3", ["noti-title"], pushData.title || "제목 없는 알림")
+                ahrefTitle.appendChild(labelTitle)
+                titleTextArea.appendChild(ahrefTitle)
+
+                const labelBody = createElementWithClass("div", ["smaller", "text-right"], pushData.body || "이 알림은 본문이 없습니다.")
+                titleTextArea.appendChild(labelBody)
+
+                if (pushData?.time) {
+                    const registerDate = createElementWithClass("div", ["text-label", "x-small", "grey", "text-right",], formatTimeStampToDateDetailed(pushData.time))
+                    titleTextArea.append(registerDate)
+                }
+
+                return baseUnit
+            }
+
+            const setupNotifications = (notificationList) => {
+                const notificationArea = document.getElementById("notification_modal_body")
+                console.log(notificationList)
+                if (!notificationList || notificationList.length === 0) {
+                    notificationArea.replaceChildren(createElementWithClass("h2", ["no-notification"], "알림이 없습니다."))
+                    return
+                }
+                const notificationElements = [...notificationList].reverse().map((pushObjNotification) => createSingleHistory(pushObjNotification))
+                notificationArea.replaceChildren(...notificationElements)
+
+            }
+
+            const setupUserPreferenceSettings = () => {
+                navigator?.serviceWorker.ready.then((serviceWorkerRegistration) => {
+                    // Do we already have a push message subscription?
+                    serviceWorkerRegistration.pushManager
+                        .getSubscription()
+                        .then((subscription) => {
+                            if (!subscription) {
+                                // We aren't subscribed to push, so set UI
+                                // to allow the user to enable push
+                                return;
+                            }
+                            promptAlertMsg("info", "푸시알림 정보를 불러오는 중...", null, null, "updated")
+                            const personalUrlWithEndpoint = `${DEVICE_PUSH_SETTINGS_URL}?${new URLSearchParams({
+                                endpoint: subscription.endpoint
+                            })}`
+                            fetch(personalUrlWithEndpoint)
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.resp_code !== "RET000") {
+                                        promptAlertMsg("warn", data.server_msg);
+                                        return
+                                    }
+                                    storeUserId(data.data._id);
+                                    promptAlertMsg("info", "불러오기 완료", null, null, "updated")
+                                    data?.identification?.identification ? window.localStorage.setItem(USER_ID_PUSH_REF, encryptRefStore(JSON.stringify(data.identification.identification))) : null;
+                                    window.localStorage.setItem(ENDPOINT_PUSH_REF, encryptRefStore(subscription.endpoint))
+                                    console.log(data)
+                                    setupNotifications(data?.data?.notifications)
+
+
+                                })
+                                .catch(err => promptAlertMsg("warn", err + '\n서버의 일시적인 문제입니다.', null, null, "error"));
+
+                        })
+                        .catch((err) => {
+                            promptAlertMsg("warn", err + '\n기기의 일시적인 문제입니다.\n현재 원인불명의 에러가 iOS 기기에서 발생 중입니다. 기기를 재부팅해 주세요', null, null, "error")
+                        });
+                });
+
+            }
+            const browserCheck = () => {
+                if (navigator.userAgent.indexOf('KAKAO') >= 0) throw new Error("카카오톡 인앱 브라우저에서는 알림을 받을 수 없습니다.\n다른 브라우저로 열기를 통해 기기의 브라우저에서 직접 열어주세요.\n");
+                if (navigator.userAgent.indexOf('[FB') >= 0) throw new Error("페이스북 인앱 브라우저에서는 알림을 받을 수 없습니다.\n다른 브라우저로 열기를 통해 기기의 브라우저에서 직접 열어주세요.\n");
+                if (navigator.userAgent.indexOf('Instagram') >= 0) throw new Error("인스타그램 인앱 브라우저에서는 알림을 받을 수 없습니다.\n다른 브라우저로 열기를 통해 기기의 브라우저에서 직접 열어주세요.\n");
+                if (navigator.userAgent.indexOf('trill') >= 0) throw new Error("틱톡 인앱 브라우저에서는 알림을 받을 수 없습니다.\n다른 브라우저로 열기를 통해 기기의 브라우저에서 직접 열어주세요.\n");
+                if (navigator.userAgent.indexOf('everytimeApp') >= 0) throw new Error("에브리타임 인앱 브라우저에서는 알림을 받을 수 없습니다.\n다른 브라우저로 열기를 통해 기기의 브라우저에서 직접 열어주세요.\n");
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                try {
+                    browserCheck()
+                } catch (err) {
+                    if (isiOS()) { // 아이폰 접속 경우
+                        promptAlertMsg("warn", err)
+                    }
+                    else { // 안드로이드 접속 경우
+                        const anchorChrome = 'intent://' + location.href.replace(/https?:\/\//i, '') + '#Intent;scheme=http;package=com.android.chrome;end';
+                        promptAlertMsg("warn", err + '\n여기를 누르면 크롬 브라우저로 이동합니다', anchorChrome)
+                    }
+                }
+                document.getElementById("notification-history").onclick = () => onClickGetPermission();
+            })
+        </script>
+
+
         <header>
-            <div class="notice">
-                <a href=#notification>
+            <div class="notice show-modal">
+                <a href=#notification id="notification-history">
                     <img src="/main/notice.png">
                 </a>
             </div>
@@ -189,6 +832,92 @@
         <footer>
             <p>Copyright &copy; HUFS SW&AI Capstone Design A4용지. All Rights Reserved.</p>
         </footer>
+
+
+        <div class="bottom-sheet">
+            <div class="sheet-overlay"></div>
+            <div class="content">
+                <div class="header">
+                    <div class="drag-icon"><span></span></div>
+                </div>
+                <div class="body" id="notification_modal_body">
+                    <h2>알림 내역을 불러오는 중...</h2>
+
+
+                </div>
+            </div>
+        </div>
+
+        <script id="bottom-sheet-handler">
+            // Select DOM elements
+            const showModalBtn = document.querySelector(".show-modal");
+            const bottomSheet = document.querySelector(".bottom-sheet");
+            const sheetOverlay = bottomSheet.querySelector(".sheet-overlay");
+            const sheetContent = bottomSheet.querySelector(".content");
+            const dragIcon = bottomSheet.querySelector(".drag-icon");
+
+            // Global variables for tracking drag events
+            let isDragging = false, startY, startHeight;
+
+            // Show the bottom sheet, hide body vertical scrollbar, and call updateSheetHeight
+            const showBottomSheet = () => {
+                bottomSheet.classList.add("show");
+                document.body.style.overflowY = "hidden";
+                updateSheetHeight(50);
+                setupUserPreferenceSettings();
+            }
+
+            const updateSheetHeight = (height) => {
+                sheetContent.style.height = `${height}vh`; //updates the height of the sheet content
+                // Toggles the fullscreen class to bottomSheet if the height is equal to 100
+                bottomSheet.classList.toggle("fullscreen", height === 100);
+            }
+
+            // Hide the bottom sheet and show body vertical scrollbar
+            const hideBottomSheet = () => {
+                bottomSheet.classList.remove("show");
+                document.body.style.overflowY = "auto";
+            }
+
+            // Sets initial drag position, sheetContent height and add dragging class to the bottom sheet
+            const dragStart = (e) => {
+                isDragging = true;
+                startY = e.pageY || e.touches?.[0].pageY;
+                startHeight = parseInt(sheetContent.style.height);
+                bottomSheet.classList.add("dragging");
+            }
+
+            // Calculates the new height for the sheet content and call the updateSheetHeight function
+            const dragging = (e) => {
+                if (!isDragging) return;
+                const delta = startY - (e.pageY || e.touches?.[0].pageY);
+                const newHeight = startHeight + delta / window.innerHeight * 100;
+                updateSheetHeight(newHeight);
+            }
+
+            // Determines whether to hide, set to fullscreen, or set to default 
+            // height based on the current height of the sheet content
+            const dragStop = () => {
+                isDragging = false;
+                bottomSheet.classList.remove("dragging");
+                const sheetHeight = parseInt(sheetContent.style.height);
+                sheetHeight < 25 ? hideBottomSheet() : sheetHeight > 75 ? updateSheetHeight(100) : updateSheetHeight(50);
+            }
+
+            dragIcon.addEventListener("mousedown", dragStart);
+            document.addEventListener("mousemove", dragging);
+            document.addEventListener("mouseup", dragStop);
+
+            dragIcon.addEventListener("touchstart", dragStart);
+            document.addEventListener("touchmove", dragging);
+            document.addEventListener("touchend", dragStop);
+
+            sheetOverlay.addEventListener("click", hideBottomSheet);
+            showModalBtn.addEventListener("click", showBottomSheet);
+
+        </script>
+        <div id="myref_alert"></div>
+
     </body>
 
 </html>

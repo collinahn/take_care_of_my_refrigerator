@@ -42,7 +42,7 @@ def find_users_for_push_notification(_restriction: dict = None, _projection: dic
     }
 
     try:
-        res = list(db_users['pwa'].find(
+        res = list(db_users.find(
             find_cond,
             _projection
         )) or tuple()
@@ -132,5 +132,5 @@ def send_unified_push_msg_to_users(users: list[dict], push_msg_as_dict: dict):
     push_msg_as_dict |= {'time': time.time()}
     bulk_write_ids = [user.get('_id') for user in users]
     bulk_write_to_collection(
-        db_users['pwa'], [updatemany_push_history(bulk_write_ids, push_msg_as_dict)])
+        db_users, [updatemany_push_history(bulk_write_ids, push_msg_as_dict)])
 

@@ -15,9 +15,9 @@ bp_register = Blueprint('register', __name__, url_prefix='/api/register')
 log = get_logger()
 
 
-@bp_register.post('/register/')
+@bp_register.post('/')
 def push_register():
-    ip_addr: str = request.remote_addr
+    ip_addr: str = request.environ.get("HTTP_X_REAL_IP", request.remote_addr)
     try:
         subscription_info: dict = json.loads(request.form.get('sub') or '{}')
         device_info: dict = json.loads(request.form.get('device') or '{}')
@@ -34,7 +34,7 @@ def push_register():
     current_t = time.time()
 
     try:
-        if matching_user := db_users['pwa'].find_one({'endpoint': endpoint_url}) or {}:
+        if matching_user := db_users.find_one({'endpoint': endpoint_url}) or {}:
             if matching_user.get('use'):
                 msg = PushMsgFormat(
                     '냉장고를 잘 부탁해', '이미 등록된 기기입니다.')
@@ -49,7 +49,7 @@ def push_register():
                         }}
                 )
             else:
-                db_users['pwa'].update_one({'_id': matching_user.get('_id')}, {
+                db_users.update_one({'_id': matching_user.get('_id')}, {
                                           '$set': {'use': True}})
                 msg = PushMsgFormat(
                     '냉장고를 잘 부탁해', '푸시알림이 다시 활성화 되었습니다.', tag='REGISTER_MSG'
@@ -65,15 +65,15 @@ def push_register():
                         }}
                 )
         if previous_info:
-            res = db_users['pwa'].find_one_and_update(
+            res: dict = db_users.find_one_and_update(
                 previous_info,
                 {
                     '$set': {
                         'last_called': current_t,
                         'use': True,
                         'register_ip': ip_addr,
-                        'sub': subscription_info
-                        **device_info
+                        'sub': subscription_info,
+                        'device': device_info,
                     }
                 },
             )
@@ -87,7 +87,7 @@ def push_register():
             first_msg_to_dict = first_msg.to_dict()
             send_push_notification.delay(subscription_info, first_msg_to_dict)
             first_msg_to_dict |= {'time': current_t}
-            bulk_write_to_collection(db_users['pwa'], [push_history_to_be_recorded(
+            bulk_write_to_collection(db_users, [push_history_to_be_recorded(
                 caller_id, first_msg_to_dict, current_t)])
 
             return success_response(
@@ -101,7 +101,7 @@ def push_register():
 
         else:
             inserted_id = str(ObjectId())
-            db_users['pwa'].insert_one({
+            db_users.insert_one({
                 '_id': inserted_id,
                 'last_called': current_t,
                 'first_reg': current_t,
@@ -120,7 +120,7 @@ def push_register():
     first_msg_to_dict = first_msg.to_dict()
     send_push_notification.delay(subscription_info, first_msg_to_dict)
     first_msg_to_dict |= {'time': current_t}
-    bulk_write_to_collection(db_users['pwa'], [push_history_to_be_recorded(
+    bulk_write_to_collection(db_users, [push_history_to_be_recorded(
         inserted_id, first_msg_to_dict, current_t)])
 
     return success_response(

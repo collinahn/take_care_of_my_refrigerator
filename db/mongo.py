@@ -24,7 +24,7 @@ class MongoAccess:
 
 client = MongoAccess.get_client()
 
-db_users = client['users']
-db_recipe = client['recipe']
-db_ingredients = client['ingredients']
+db_users = client['refrigerator']['user']
+db_recipe = client['refrigerator']['recipe']
+db_ingredients = client['refrigerator']['ingredients']
 
