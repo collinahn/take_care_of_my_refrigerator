@@ -10,6 +10,12 @@ header {
   align-items: center;
 }
 
+.notice {
+  display: flex;
+  width: 40px;
+  height: 40px;
+}
+
 .notice img {
   width: 20px;
   height: auto;
@@ -82,10 +88,7 @@ h3 {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  row-gap: 3px;
   color: black;
-  margin: 0 4px;
-  padding: 5px;
   border-radius: 10px;
 }
 .notification-history .title-img {
