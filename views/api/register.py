@@ -39,7 +39,7 @@ def push_register():
                 msg = PushMsgFormat(
                     '냉장고를 잘 부탁해', '이미 등록된 기기입니다.')
                 send_push_notification.delay(
-                    matching_user, msg.to_dict(), priority=False)
+                    matching_user, msg.to_dict())
                 return success_response(
                     '푸시 알림 요청을 보냈습니다.\n푸시알림이 오지 않는경우 브라우저의 알림설정을 확인해주세요.',
                     data={
@@ -55,7 +55,7 @@ def push_register():
                     '냉장고를 잘 부탁해', '푸시알림이 다시 활성화 되었습니다.', tag='REGISTER_MSG'
                 )
                 send_push_notification.delay(
-                    matching_user, msg.to_dict(), priority=False)
+                    matching_user, msg.to_dict())
                 return success_response(
                     '기기가 다시 등록되었습니다.',
                     data={

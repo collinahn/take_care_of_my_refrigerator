@@ -503,7 +503,7 @@
             }
 
             // REGISTER SERVICE WORKER
-            async function regWorkerToServer() {
+            async function regWorkerToServer(forceUpdate) {
                 updateServiceWorker()
 
                 // SUBSCRIBE TO PUSH SERVER
@@ -547,7 +547,6 @@
                                                         promptAlertMsg("info", json.server_msg, null, null, "server_msg")
                                                         json?.data?.identification ? window.localStorage.setItem(USER_ID_PUSH_REF, encryptRefStore(JSON.stringify(json.data.identification))) : null;
                                                         window.localStorage.setItem(ENDPOINT_PUSH_REF, encryptRefStore(sub.endpoint))
-
                                                         setupUserPreferenceSettings()
                                                     })
                                                     .catch(err => promptAlertMsg("warn", err, null, null, "server_err_msg"));
@@ -580,7 +579,7 @@
 
                                         const previousEndpoint = window.localStorage.getItem(ENDPOINT_PUSH_REF)
                                         const previousEndpointDecrypted = previousEndpoint ? decryptRefStore(previousEndpoint) : null
-                                        if (previousEndpointDecrypted === sub.endpoint) {
+                                        if (!forceUpdate && previousEndpointDecrypted === sub.endpoint) {
                                             console.log("Already registered, endpoint same")
                                             return
                                         }
@@ -742,6 +741,7 @@
             }
 
             const setupUserPreferenceSettings = () => {
+                let requestCnt = 0
                 navigator?.serviceWorker.ready.then((serviceWorkerRegistration) => {
                     // Do we already have a push message subscription?
                     serviceWorkerRegistration.pushManager
@@ -761,6 +761,11 @@
                                 .then(data => {
                                     if (data.resp_code !== "RET000") {
                                         promptAlertMsg("warn", data.server_msg);
+                                        if (data.resp_code === "RET001") {
+                                            if (requestCnt > 3) return
+                                            regWorkerToServer(true)
+                                            requestCnt += 1
+                                        }
                                         return
                                     }
                                     storeUserId(data.data._id);
@@ -861,6 +866,7 @@
 
             // Show the bottom sheet, hide body vertical scrollbar, and call updateSheetHeight
             const showBottomSheet = () => {
+                document.querySelector("body").style.overflowY = "hidden";
                 bottomSheet.classList.add("show");
                 document.body.style.overflowY = "hidden";
                 updateSheetHeight(50);
@@ -875,6 +881,7 @@
 
             // Hide the bottom sheet and show body vertical scrollbar
             const hideBottomSheet = () => {
+                document.querySelector("body").style.overflowY = "auto";
                 bottomSheet.classList.remove("show");
                 document.body.style.overflowY = "auto";
             }

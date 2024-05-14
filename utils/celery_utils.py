@@ -21,11 +21,11 @@ from utils.pwa_push import PushMsgFormat
 log = get_logger()
 
 def filter_necessary_for_push_notification(user_push_settings: dict):
-    included_keys = {'_id', 'endpoint', 'keys'}
+    subscription_info = user_push_settings.get('sub', {})
+    user_id = user_push_settings.get('_id')
     return {
-        k: v
-        for k, v in user_push_settings.items()
-        if k in included_keys
+        '_id': user_id,
+        **subscription_info,
     }
 
 
@@ -110,9 +110,9 @@ def updatemany_push_history(push_dest_ids: list[str], push_msg: dict, history_de
 
 def send_unified_push_msg_to_users(users: list[dict], push_msg_as_dict: dict):
     '''
-    celery_nodes는 7개
+    celery_nodes는 3개
     '''
-    CELERY_NODES = 7
+    CELERY_NODES = 3
     node_batches_subs_info = [users[i::CELERY_NODES]
                               for i in range(CELERY_NODES)]
     notification_groups: list[group] = []
