@@ -158,6 +158,7 @@
 
 
         <link rel="stylesheet" href="/css/home.css" />
+        <link rel="stylesheet" href="/css/common.css" />
         <link rel="stylesheet" href="/css/bottom_sheet.css" />
 
 
@@ -207,127 +208,24 @@
                 return nodeElement;
             };
 
-            const createElementWithClassV2 = (
-                tagName,
-                classNameList,
-                attributes,
-                datasets,
-                children
-            ) => {
-                let nodeElement = document.createElement(tagName);
-                if (classNameList) {
-                    nodeElement.classList.add(...classNameList);
-                }
-                if (attributes) {
-                    Object.entries(attributes).forEach(([attr, value]) => {
-                        switch (attr) {
-                            case "innerHtml": {
-                                nodeElement.innerHTML = value;
-                                break;
-                            }
-                            case "innerHTML": {
-                                nodeElement.innerHTML = value;
-                                break;
-                            }
-                            case "innerText": {
-                                nodeElement.innerText = value;
-                                break;
-                            }
-                            case "onclick": {
-                                nodeElement.onclick = value;
-                                break;
-                            }
-                            case "onchange": {
-                                nodeElement.onchange = value;
-                                break;
-                            }
-                            case "onscroll": {
-                                nodeElement.onscroll = value;
-                                break;
-                            }
-                            case "onmouseover": {
-                                nodeElement.onmouseover = value;
-                                break;
-                            }
-                            case "onmousemove": {
-                                nodeElement.onmousemove = value;
-                                break;
-                            }
-                            case "onmouseout": {
-                                nodeElement.onmouseout = value;
-                                break;
-                            }
-                            case "onsubmit": {
-                                nodeElement.onsubmit = value;
-                                break;
-                            }
-                            case "oninput": {
-                                nodeElement.oninput = value;
-                                break;
-                            }
-                            case "ontransitionend": {
-                                nodeElement.ontransitionend = value;
-                                break;
-                            }
-                            case "onwheel": {
-                                nodeElement.onwheel = value;
-                                break;
-                            }
-                            case "checked": {
-                                nodeElement.checked = value;
-                                break;
-                            }
-                            case "value": {
-                                nodeElement.value = value;
-                                break;
-                            }
-                            case "style": {
-                                Object.entries(value).forEach(([cssAttr, value]) => {
-                                    nodeElement.style.setProperty(cssAttr, value);
-                                });
-                                break;
-                            }
-                            case "dataset": {
-                                Object.entries(value).forEach(([attr, value]) => {
-                                    nodeElement.setAttribute(`data-${attr}`, value);
-                                });
-                                break;
-                            }
-                            case "class": {
-                                nodeElement.classList.add(...value);
-                                break;
-                            }
-                            default:
-                                nodeElement.setAttribute(attr, value);
-                        }
-                    });
-                }
-                if (datasets) {
-                    Object.entries(datasets).forEach(([attr, value]) => {
-                        nodeElement.setAttribute(`data-${attr}`, value);
-                    });
-                }
-                if (children) {
-                    children.forEach((el) => nodeElement.appendChild(el));
-                }
-                return nodeElement;
-            };
             const removeFadeOut = (element) => {
                 element.classList.add("slow-opacity-trans");
                 element.style.opacity = 0;
-                element.style.transform = "translateX(-15px) scale(0.8)";
+                element.style.transform = "translateY(-20px) scale(0.9)";
                 element.ontransitionend = (e) => {
                     e.target.parentNode?.removeChild(e.target)
                     e.target.classList.remove("slow-opacity-trans")
+                    e.target.ontransitionend = null;
                 };
             };
             const removeFadeOutImmediately = (element) => {
-                element.classList.add("medium-opacity-trans");
+                element.classList.add("fast-opacity-trans");
                 element.style.transform = "translateY(-15px)";
                 element.style.opacity = 0;
                 element.ontransitionend = (e) => {
                     e.target.parentNode?.removeChild(e.target)
-                    e.target.classList.remove("medium-opacity-trans")
+                    e.target.classList.remove("fast-opacity-trans")
+                    e.target.ontransitionend = null;
                 };
             };
             const removeMatchingMsg = (id) => {
@@ -354,8 +252,10 @@
                 setTimeout(() => {
                     targetEl.style.opacity = 1;
                     targetEl.style.transform = "none";
-                    targetEl.ontransitionend = (e) =>
+                    targetEl.ontransitionend = (e) => {
                         e.target.classList.remove("fast-opacity-trans");
+                        e.target.ontransitionend = null;
+                    }
                 }, 30);
             };
             const promptAlertMsg = (
@@ -409,11 +309,13 @@
                 }
                 if (id) {
                     singleAlertMsg.id = id;
+                } else {
+                    singleAlertMsg.id = "DEFAULT_ALERT_ID"
                 }
-                appendFadeIn(poppupArea, singleAlertMsg, id);
                 setTimeout(() => {
                     removeFadeOut(singleAlertMsg);
                 }, disappearTimeInMilisec);
+                appendFadeIn(poppupArea, singleAlertMsg, id);
             };
 
         </script>
@@ -548,6 +450,10 @@
                                                         json?.data?.identification ? window.localStorage.setItem(USER_ID_PUSH_REF, encryptRefStore(JSON.stringify(json.data.identification))) : null;
                                                         window.localStorage.setItem(ENDPOINT_PUSH_REF, encryptRefStore(sub.endpoint))
                                                         setupUserPreferenceSettings()
+                                                        setTimeout(() => {
+                                                            const showModalBtn = document.querySelector(".show-modal");
+                                                            showModalBtn?.click();
+                                                        }, 500)
                                                     })
                                                     .catch(err => promptAlertMsg("warn", err, null, null, "server_err_msg"));
                                             },
@@ -806,7 +712,6 @@
                         promptAlertMsg("warn", err + '\n여기를 누르면 크롬 브라우저로 이동합니다', anchorChrome)
                     }
                 }
-                document.getElementById("notification-history").onclick = () => onClickGetPermission();
             })
         </script>
 
@@ -855,6 +760,7 @@
 
         <script id="bottom-sheet-handler">
             // Select DOM elements
+            const body = document.querySelector("body");
             const showModalBtn = document.querySelector(".show-modal");
             const bottomSheet = document.querySelector(".bottom-sheet");
             const sheetOverlay = bottomSheet.querySelector(".sheet-overlay");
@@ -866,9 +772,16 @@
 
             // Show the bottom sheet, hide body vertical scrollbar, and call updateSheetHeight
             const showBottomSheet = () => {
-                document.querySelector("body").style.overflowY = "hidden";
+                if (!isNotificationGranted()) {
+                    onClickGetPermission()
+                    return
+                } else {
+                    onClickGetPermission()
+                }
+
                 bottomSheet.classList.add("show");
                 document.body.style.overflowY = "hidden";
+                body.classList.add("lock-position")
                 updateSheetHeight(50);
                 setupUserPreferenceSettings();
             }
@@ -881,9 +794,9 @@
 
             // Hide the bottom sheet and show body vertical scrollbar
             const hideBottomSheet = () => {
-                document.querySelector("body").style.overflowY = "auto";
                 bottomSheet.classList.remove("show");
                 document.body.style.overflowY = "auto";
+                body.classList.remove("lock-position")
             }
 
             // Sets initial drag position, sheetContent height and add dragging class to the bottom sheet
@@ -892,6 +805,7 @@
                 startY = e.pageY || e.touches?.[0].pageY;
                 startHeight = parseInt(sheetContent.style.height);
                 bottomSheet.classList.add("dragging");
+                promptAlertMsg("info", "드래그하여 높이 조절", null, null, "dragging")
             }
 
             // Calculates the new height for the sheet content and call the updateSheetHeight function
@@ -921,6 +835,7 @@
 
             sheetOverlay.addEventListener("click", hideBottomSheet);
             showModalBtn.addEventListener("click", showBottomSheet);
+
 
         </script>
         <div id="myref_alert"></div>

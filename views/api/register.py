@@ -116,7 +116,7 @@ def push_register():
         return server_error('DB서버의 오류로 저장하지 못했습니다. 잠시 후 다시 이용해주세요.'), 400
 
     first_msg = PushMsgFormat(
-        '⚡️냉장고를 부탁해 첫 푸시!', '기기가 정상적으로 등록되었습니다🎉', tag='REGISTER_MSG')
+        '⚡️냉장고를 잘 부탁해 첫 푸시!', '기기가 정상적으로 등록되었습니다🎉', tag='REGISTER_MSG')
     first_msg_to_dict = first_msg.to_dict()
     send_push_notification.delay(subscription_info, first_msg_to_dict)
     first_msg_to_dict |= {'time': current_t}
