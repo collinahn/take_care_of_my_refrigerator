@@ -330,7 +330,7 @@
             const isNum = (val) => typeof val === "number";
             const isObj = (val) => val?.constructor.name === "Object";
             const isEmptyObj = (val) => Object.keys(val).length === 0 && val.constructor === Object;
-            const isNotificationGranted = () => Notification?.permission === "granted";
+            const isNotificationGranted = () => 'Notification' in window && Notification?.permission === "granted";
             const isNotificationGrantedYet = () => Notification?.permission === "default";
             const updateServiceWorker = () => navigator?.serviceWorker?.register("/service-worker.js", { scope: "/" });
             const updateServiceWorkerIfGranted = () => isNotificationGranted() ? updateServiceWorker() : null;
