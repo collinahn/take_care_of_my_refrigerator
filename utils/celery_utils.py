@@ -120,7 +120,7 @@ def send_unified_push_msg_to_users(users: list[dict], push_msg_as_dict: dict):
         noti_tasks = [
             send_push_notification.s(
                 filter_necessary_for_push_notification(notifee),
-                push_msg_as_dict, False
+                push_msg_as_dict
             )
             for notifee in subscriptions
         ]

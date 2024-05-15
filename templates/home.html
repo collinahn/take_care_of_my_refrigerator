@@ -757,6 +757,15 @@
                 </div>
             </div>
         </div>
+        <script id="safety-measures">
+            document.addEventListener("DOMContentLoaded", () => {
+
+                document.querySelector(".menu").querySelectorAll('a').forEach((elem) => {
+                    elem.removeAttribute("href")
+                    elem.onclick = () => promptAlertMsg("warn", "아직 준비중입니다.", null, null, "not_ready")
+                })
+            })
+        </script>
 
         <script id="bottom-sheet-handler">
             // Select DOM elements
