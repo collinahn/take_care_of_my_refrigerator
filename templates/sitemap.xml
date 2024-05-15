@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+<url>
+<loc>https://myrefrigerator.store/</loc>
+  <lastmod>{{ today }}</lastmod>
+  <changefreq>hourly</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+<loc>https://myrefrigerator.store/settings/</loc>
+  <lastmod>{{ today }}</lastmod>
+  <changefreq>hourly</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+<loc>https://myrefrigerator.store/search/</loc>
+  <lastmod>{{ today }}</lastmod>
+  <changefreq>hourly</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+<loc>https://myrefrigerator.store/recipe/</loc>
+  <lastmod>{{ today }}</lastmod>
+  <changefreq>hourly</changefreq>
+  <priority>0.80</priority>
+</url>
+
+
+</urlset>

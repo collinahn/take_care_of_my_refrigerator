@@ -22,9 +22,9 @@ server_log = get_logger()
 
 
 def log_visitor_msg():
-    log_msg = f'access from {request.remote_addr} {request.headers.get("User-Agent")}'
+    ip_address = request.environ.get("HTTP_X_REAL_IP", request.remote_addr)
+    return f'access from {ip_address} {request.headers.get("User-Agent")}'
 
-    return log_msg
 
 
 @bp_main.get('/')
@@ -50,7 +50,7 @@ def refrigerator():
 @bp_main.get('/settings/')
 def push_settings():
     server_log.info(log_visitor_msg())
-    return render_template('push_settings.html'), 200
+    return render_template('settings.html'), 200
 
 @bp_main.get('/sitemap.xml')
 def main_sitemap():
