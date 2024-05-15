@@ -22,8 +22,12 @@ class Ingredients(ToDict):
     '''
     재료 클래스
     '''
-    ...
-    
+    ingredient_id: str
+    name: str
+    recommended_expiration: int
+    category: str
+    tip: str
+    is_significant: bool
     
 @dataclass
 class IngredientsInput(Ingredients, ToDict):
@@ -31,4 +35,7 @@ class IngredientsInput(Ingredients, ToDict):
     재료 입력 클래스
     유저가 재료를 추가할 때마다 생성됨
     '''
-    ...
+    input_id: str
+    date_input: int
+    expiration_date: int
+    count: int
