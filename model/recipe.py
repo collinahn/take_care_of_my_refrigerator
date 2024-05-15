@@ -9,11 +9,11 @@ from dataclasses import dataclass, asdict, field, is_dataclass
 from model.ingredients import ToDict
         
 
-@dataclass
+@dataclass(frozen=True)
 class Recipe(ToDict):
     '''
     Recipe 클래스
     '''
-    ...
-    
-    
+    ingredient_group: list[str]
+    cook_time: int
+    explanation: str
