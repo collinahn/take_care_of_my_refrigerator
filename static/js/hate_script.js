@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
         li.textContent = keyword;
         const deleteBtn = document.createElement('span');
         deleteBtn.classList.add('deleteBtn');
-        deleteBtn.innerHTML = '&nbsp;&nbsp;<b>x</b>'; // x를 볼드체로 만들고 스페이스 추가
+        deleteBtn.innerHTML = '✕'; // x를 볼드체
         deleteBtn.addEventListener('click', () => deleteKeyword(keyword));
         li.appendChild(deleteBtn);
         keywordList.appendChild(li);
