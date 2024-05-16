@@ -718,9 +718,9 @@
 
         <header>
             <div class="notice show-modal">
-                <a href=#notification id="notification-history">
+                <div id="notification-history">
                     <img src="/main/notice.png">
-                </a>
+                </div>
             </div>
             <div class="menu">
                 <a href="/refrigerator">냉장고</a>
@@ -761,7 +761,9 @@
             document.addEventListener("DOMContentLoaded", () => {
 
                 document.querySelector(".menu").querySelectorAll('a').forEach((elem) => {
+                    if (elem.href.includes("settings")) return
                     elem.removeAttribute("href")
+                    elem.style.opacity = 0.5
                     elem.onclick = () => promptAlertMsg("warn", "아직 준비중입니다.", null, null, "not_ready")
                 })
             })
