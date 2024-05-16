@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -175,6 +176,31 @@
                 <a href="/settings">프로필</a>
             </div>
         </header>
+        <main>
+            <div class="tab-menu">
+                <button class="tab-link" onclick="activateTab(event, 'search')">검색</button>
+                <button class="tab-link" onclick="activateTab(event, 'favorites')">즐겨찾기</button>
+                <button class="tab-link" onclick="activateTab(event, 'recent')">최근 본 레시피</button>
+            </div>
+            <hr>
+            <div class="content-box">
+                <form class="search-form">
+                    <div class="form-group">
+                        <label for="recipeName">요리명</label>
+                        <input type="text" id="recipeName" placeholder="입력하세요.">
+                    </div>
+                    <div class="form-group">
+                        <label for="keyword">선호 키워드 (재료, 카테고리 등)</label>
+                        <input type="text" id="keyword" placeholder="입력하세요.">
+                    </div>
+                    <p>*요리명 혹은 키워드 하나 이상 입력 필수</p>
+                    <button type="submit" class="search-button">
+                        <img src="/resources/search.png" alt="Search">
+                    </button>
+                </form>
+            </div>
+        </main>
+        <script src="/js/recipe_script.js"></script>
         <footer>
             <p>Copyright &copy; HUFS SW&AI Capstone Design A4용지. All Rights Reserved.</p>
         </footer>
