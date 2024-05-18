@@ -166,13 +166,13 @@
     <body>
         <header>
             <div class="logo">
-                <a href=#home>
-                    <img src="/resources/logo.jpg">
+                <a href="#home">
+                    <img src="/resources/logo.jpg" alt="Logo">
                 </a>
             </div>
             <div class="menu">
+                <a href="/refrigerator">캘린더</a>
                 <a href="/refrigerator">냉장고</a>
-                <a href="/recipe">레시피</a>
                 <a href="/settings">프로필</a>
             </div>
         </header>
@@ -183,7 +183,7 @@
                 <button class="tab-link" onclick="activateTab(event, 'recent')">최근 본 레시피</button>
             </div>
             <hr>
-            <div class="content-box">
+            <div id="search" class="content-box">
                 <form class="search-form">
                     <div class="form-group">
                         <label for="recipeName">요리명</label>
@@ -199,8 +199,12 @@
                     </button>
                 </form>
             </div>
+            <div id="favorites" class="content-box" style="display:none;">
+            </div>
+            <div id="recent" class="content-box" style="display:none;">
+            </div>
         </main>
-        <script src="/js/search_script.js"></script>
+        <script src="/js/search.js"></script>
         <footer>
             <p>Copyright &copy; HUFS SW&AI Capstone Design A4용지. All Rights Reserved.</p>
         </footer>

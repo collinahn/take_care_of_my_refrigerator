@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "gbdt debugger",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "$PYTHONPATH:/c/Users/hyuni/Desktop/take_care_of_my_refrigerator/" 
+            },
+        }
+    ]
+}
