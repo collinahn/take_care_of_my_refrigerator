@@ -166,3 +166,4 @@ __classified/
 
 .DS_Store
 static/.DS_Store
+.prettierignore

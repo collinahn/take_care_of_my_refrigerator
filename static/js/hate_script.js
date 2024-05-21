@@ -1,3 +1,31 @@
+import {
+  promptAlertMsg,
+  getSubscriptionEndpoint
+} from "./utils.js";
+
+const API_DOMAIN = 'https://myrefrigerator.store';
+
+const updateHateKeywordsSettings = async (hateKeywords) => {
+    const response = await fetch(`${API_DOMAIN}/api/user/settings/profile.hate/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'data': hateKeywords || [],
+            'endpoint': await getSubscriptionEndpoint(),
+        }),
+    });
+    const respJson = await response.json();
+
+    if (respJson.resp_code === 'RET000') {
+        promptAlertMsg('info', '설정이 저장되었습니다.');
+        return true;
+    } 
+    promptAlertMsg('warn', respJson?.server_msg || '설정 저장에 실패했습니다.');
+    return false;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const keywordForm = document.getElementById('keywordForm');
     const keywordInput = document.getElementById('keywordInput');
@@ -14,31 +42,40 @@ document.addEventListener('DOMContentLoaded', function() {
         const deleteBtn = document.createElement('span');
         deleteBtn.classList.add('deleteBtn');
         deleteBtn.innerHTML = '✕'; // x를 볼드체
-        deleteBtn.addEventListener('click', () => deleteKeyword(keyword));
+        deleteBtn.addEventListener('click', async () => await deleteKeyword(keyword));
         li.appendChild(deleteBtn);
         keywordList.appendChild(li);
       });
     }
   
     // 키워드 추가
-    keywordForm.addEventListener('submit', function(event) {
+    keywordForm.addEventListener('submit', async (event) => {
       event.preventDefault();
       const newKeyword = keywordInput.value.trim();
       if (newKeyword) {
         savedKeywords.push(newKeyword);
-        localStorage.setItem('keywords', JSON.stringify(savedKeywords));
-        renderKeywords();
-        keywordInput.value = '';
+
+        if (await updateHateKeywordsSettings(savedKeywords)) {
+            localStorage.setItem('keywords', JSON.stringify(savedKeywords));
+            renderKeywords();
+            keywordInput.value = '';
+        } else {
+            renderKeywords();
+        }
+
       }
     });
   
     // 키워드 삭제
-    function deleteKeyword(keyword) {
+    async function deleteKeyword(keyword) {
       const index = savedKeywords.indexOf(keyword);
       if (index !== -1) {
         savedKeywords.splice(index, 1);
-        localStorage.setItem('keywords', JSON.stringify(savedKeywords));
-        renderKeywords();
+
+        if (await updateHateKeywordsSettings(savedKeywords)) {
+            localStorage.setItem('keywords', JSON.stringify(savedKeywords));
+            renderKeywords();
+        }
       }
     }
   

@@ -50,7 +50,7 @@ def user_push_settings():
     )
 
 
-@bp_user.post('/settings/')
+@bp_user.post('/settings/<settings_key>/')
 def set_user_preference(settings_key: str):
     '''
     개인 선호 설정을 저장한다
@@ -70,7 +70,7 @@ def set_user_preference(settings_key: str):
             },
             {
                 '$set': {
-                    settings_key: request_body.get(request_body.get('data'))
+                    settings_key: request_body.get('data', None)
                 }
             }
         )
