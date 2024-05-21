@@ -50,7 +50,7 @@ def user_push_settings():
     )
 
 
-@bp_user.post('/settings/<settings_key>/')
+@bp_user.post('/settings/')
 def set_user_preference(settings_key: str):
     '''
     개인 선호 설정을 저장한다
@@ -61,12 +61,12 @@ def set_user_preference(settings_key: str):
     
     request_body =  request.get_json(silent=True) or {}
     if request_body.get('endpoint') is None:
-        return incorrect_data_response('wrong request'), 400
+        return incorrect_data_response('기기 등록 후에 이용해주세요'), 400
     
     try:
         updated_res = db_users.update_one(
             {
-                'endpoint': request_body['endpoint']
+                'sub.endpoint': request_body['endpoint']
             },
             {
                 '$set': {
