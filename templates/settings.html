@@ -189,6 +189,13 @@
                 <div class="memoBox">
                     <textarea id="memoTextArea" placeholder="메모를 작성하세요..."></textarea>
                 </div>
+                <script>
+                    const memoTextArea = document.getElementById('memoTextArea');
+                    memoTextArea.value = localStorage.getItem('memo');
+                    memoTextArea.addEventListener('input', () => {
+                        localStorage.setItem('memo', memoTextArea.value);
+                    });
+                </script>
             </div>
         </div>
         <script type="module" src="/js/utils.js"></script>
