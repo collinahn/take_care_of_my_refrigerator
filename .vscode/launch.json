@@ -8,7 +8,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {
-                "PYTHONPATH": "$PYTHONPATH:/c/Users/hyuni/Desktop/take_care_of_my_refrigerator/" 
+                "PYTHONPATH": "$PYTHONPATH:C:\\Users\\hyuni\\Desktop\\take_care_of_my_refrigerator" 
             },
         }
     ]
