@@ -167,3 +167,5 @@ __classified/
 .DS_Store
 static/.DS_Store
 .prettierignore
+.vscode/
+model/gsheet*
