@@ -9,4 +9,4 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
-# set FLASK_APP=server.main; flask run
+# export FLASK_APP=server.main; flask run

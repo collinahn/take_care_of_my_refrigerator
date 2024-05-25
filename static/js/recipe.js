@@ -24,6 +24,16 @@ function toggleFavorite(button) {
     }
 }
 
+function removeRecipe(event) {
+    const recipeItem = event.currentTarget.closest(".recipe-item");
+    recipeItem.remove();
+}
+
 window.onload = function() {
     document.querySelector('.tab-link[onclick="activateTab(event, \'search\')"]').click();
-}
+    
+    const closeButtons = document.querySelectorAll('.close-button');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', removeRecipe);
+    });
+};
