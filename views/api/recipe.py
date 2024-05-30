@@ -20,7 +20,7 @@ def recipe(recipe_id):
         return incorrect_data_response('recipe_id is required')
     
     try:
-        recipe_info = db_recipe['recipe'].find_one(
+        recipe_info = db_recipe.find_one(
             {'_id': ObjectId(recipe_id)},
             {
                 'original_url': 0,
@@ -48,7 +48,7 @@ def bulk_recipe():
     recipes = recipe_ids.split('|')
     
     try:
-        recipes = db_recipe['recipe'].find(
+        recipes = db_recipe.find(
             {
                 '_id': {'$in': [ObjectId(recipe_id) for recipe_id in recipes]}
             },
