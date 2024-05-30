@@ -2,7 +2,6 @@ import json
 import time
 from flask import Blueprint, request
 from pymongo.errors import PyMongoError
-from bson import ObjectId
 
 from db.mongo import db_users, db_recipe
 from utils.pwa_push import PushMsgFormat, PushSettings
@@ -21,7 +20,7 @@ def recipe(recipe_id):
     
     try:
         recipe_info = db_recipe.find_one(
-            {'_id': ObjectId(recipe_id)},
+            {'_id': recipe_id},
             {
                 'original_url': 0,
             }
@@ -50,7 +49,7 @@ def bulk_recipe():
     try:
         recipes = db_recipe.find(
             {
-                '_id': {'$in': [ObjectId(recipe_id) for recipe_id in recipes]}
+                '_id': {'$in': [recipes]}
             },
             {
                 'original_url': 0,
