@@ -24,5 +24,8 @@ function activateTab(evt, tabName) {
     }
     else {
         document.getElementById("search-interaction").style.display = "block";
+        if (document.querySelector('.recipe-list')?.children?.length !== 0) {
+            document.getElementById("search").style.display = "none";
+        }
     }
 }

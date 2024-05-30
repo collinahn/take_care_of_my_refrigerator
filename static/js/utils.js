@@ -20,7 +20,7 @@ export const createElementWithClass = (
 export const removeFadeOut = (element) => {
     element.classList.add("slow-opacity-trans");
     element.style.opacity = 0;
-    element.style.transform = "translateY(-20px) scale(0.9)";
+    element.style.transform = "translateY(20px)";
     element.ontransitionend = (e) => {
         e.target.parentNode?.removeChild(e.target)
         e.target.classList.remove("slow-opacity-trans")

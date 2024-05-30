@@ -7,11 +7,11 @@ import {
 
 const API_DOMAIN = 'http://myrefrigerator.store';
 
-const getSearchResult = async (formData, forceCidx) => {
+const getSearchResult = async (formData, forceCidx, sortFilter) => {
     const resultArea = document.querySelector('.recipe-list');
     const cidx = forceCidx ?? (resultArea.querySelectorAll('.recipe-item')?.length || 0);
 
-    const response = await fetch(`${API_DOMAIN}/api/search/recipe/?${new URLSearchParams(formData).toString()}&cidx=${cidx}`);
+    const response = await fetch(`${API_DOMAIN}/api/search/recipe/?${new URLSearchParams(formData).toString()}&cidx=${cidx}&sort=${sortFilter ||"DEFAULT"}`);
     const respJson = await response.json();
     if (respJson.resp_code === 'RET000') {
         promptAlertMsg('info', respJson?.server_msg);
@@ -85,12 +85,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 100);
 
     const searchForm = document.querySelector('.search-form');
-    searchForm.onsubmit = (e) => {
+    searchForm.onsubmit = async (e) => {
         e.preventDefault();
 
         const formData = new FormData(e.target, e.submitter);
-        console.log([...formData.keys()])
-        console.log([...formData.values()])
         for (let pair of formData.entries()) {
             console.log(pair, formData)
         }
@@ -98,12 +96,34 @@ document.addEventListener('DOMContentLoaded', async () => {
             promptAlertMsg('warn', '검색어를 입력해주세요.');
             return;
         }
+        const resultArea = document.querySelector('.recipe-list');
+        Array.from(resultArea?.children)?.forEach?.(child => {
+            removeFadeOut(child);
+        })
+        await getSearchResult(formData, 0);
+        if (document.querySelector('.recipe-list')?.children?.length !== 0) {
+            addSeeMoreButtonRecursive(formData);
+        }
+    }
 
-        getSearchResult(formData, 0);
-        addSeeMoreButtonRecursive(formData);
+    const searchSortFilter = document.getElementById('filter');
+    searchSortFilter.onchange = async (e) => {
+        const searchForm = document.querySelector('.search-form');
+        const formData = new FormData(searchForm);
+        const sortFilter = e.target.value;
+        const resultArea = document.querySelector('.recipe-list');
+        Array.from(resultArea?.children)?.forEach?.(child => {
+            removeFadeOut(child);
+        })
+        await getSearchResult(formData, 0, sortFilter);
+        if (document.querySelector('.recipe-list')?.children?.length !== 0) {
+            addSeeMoreButtonRecursive(formData);
+        }
     }
 
     await getFavorites();
+
+
 });
 
 const renderDefaultSearchArea = () => {

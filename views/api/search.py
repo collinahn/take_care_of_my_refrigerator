@@ -31,6 +31,14 @@ def search_recipe():
     keyword = request.args.get('keyword')
     endpoint = request.args.get('endpoint')
     cidx = int(request.args.get('cidx', 0))
+    sort = request.args.get('sort', 'DEFAULT')
+    sort_method = ()
+    if sort == "COOK_TIME":
+        sort_method = (
+            'cook_time', 1
+        )
+        
+        
     
     try:
         _searched_recipe = list(db_recipe.find(
@@ -49,7 +57,9 @@ def search_recipe():
                 'difficulty': 1,
                 'score': {'$meta': 'textScore'}
             }
-        ).sort([('score', {'$meta': 'textScore'})]).skip(cidx).limit(20))
+        ).sort([
+            sort_method, ('score', {'$meta': 'textScore'})
+        ] if sort_method else [('score', {'$meta': 'textScore'})]).skip(cidx).limit(20))
         
         if not _searched_recipe:
             return incorrect_data_response('검색 결과가 없습니다'), 404
