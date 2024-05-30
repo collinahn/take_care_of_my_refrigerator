@@ -38,6 +38,10 @@
   font-size: small;
   align-self: center;
 }
+#myref_alert .warn .text {
+  color: white;
+  font-weight: bold;
+}
 #myref_alert a {
   color: inherit;
 }

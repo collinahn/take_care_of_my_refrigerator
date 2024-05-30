@@ -108,7 +108,9 @@ def set_favorite_recipe():
     except PyMongoError as pe:
         log.error(pe)
         return server_error('잠시 후 다시 이용해주세요'), 500
-    
+        
+    if updated_res.matched_count == 0:
+        return incorrect_data_response('기기가 등록되지 않았습니다.'), 400
     if updated_res.modified_count == 0:
         return incorrect_data_response('변경 사항이 없습니다.'), 400
     
@@ -139,6 +141,8 @@ def delete_favorite_recipe():
         log.error(pe)
         return server_error('잠시 후 다시 이용해주세요'), 500
     
+    if updated_res.matched_count == 0:
+        return incorrect_data_response('기기가 등록되지 않았습니다.'), 400
     if updated_res.modified_count == 0:
         return incorrect_data_response('변경 사항이 없습니다.'), 400
     

@@ -18,7 +18,7 @@ def recipe(recipe_id):
     if not recipe_id:
         return incorrect_data_response('recipe_id is required')
     
-    user_favorite_info = None
+    user_favorite_info = {}
     endpoint = request.args.get('endpoint')
     
     try:
@@ -57,7 +57,7 @@ def bulk_recipe():
     
     recipes = recipe_ids.split('|')
     
-    user_favorite_info = None
+    user_favorite_info = {}
     endpoint = request.args.get('endpoint')
     
     try:

@@ -68,17 +68,17 @@ const setUpFavoriteButton = async (isFavorite) => {
         favoriteButton.innerHTML = "☆";
     }
 
-    favoriteButton.addEventListener('click', async () => {
+    favoriteButton.onclick = async () => {
         if (isFavorite) {
             if (await deleteFavorite()) {
-                favoriteButton.innerHTML = "☆";
+                setUpFavoriteButton(false);
             }
         } else {
             if (await setFavorite()) {
-                favoriteButton.innerHTML = "★";
+                setUpFavoriteButton(true);
             }
         }
-    });
+    }
 }
 
 
@@ -118,8 +118,7 @@ const deleteFavorite = async () => {
     const response = await fetch(`${API_DOMAIN}/api/user/favorite/?${new URLSearchParams({
         'recipe_id': getCurrentId(),
         'endpoint': endpointUrl,
-    }).toString()}
-    })}`, {
+    }).toString()}`, {
         method: 'DELETE',
     });
     const respJson = await response.json();
@@ -140,7 +139,7 @@ const getSearchResult = async (formData) => {
     const recipeStep = resultArea.querySelector('#recipe-step');
     
 
-    const response = await fetch(`${API_DOMAIN}/api/recipe/${getCurrentId()}/`);
+    const response = await fetch(`${API_DOMAIN}/api/recipe/${getCurrentId()}/?endpoint=${await getSubscriptionEndpoint()}`);
     const respJson = await response.json();
     if (respJson.resp_code === 'RET000') {
         setUpFavoriteButton(respJson.data.favorite);
