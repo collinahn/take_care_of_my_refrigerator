@@ -3,7 +3,7 @@ import time
 from flask import Blueprint, request
 from pymongo.errors import PyMongoError
 
-from db.mongo import db_users
+from db.mongo import db_users, db_recipe
 from utils.pwa_push import PushMsgFormat, PushSettings
 from utils.response import incorrect_data_response, server_error, success_response
 from utils.logger import get_logger
@@ -83,6 +83,47 @@ def set_user_preference(settings_key: str):
     
     return success_response('성공')
 
+@bp_user.get('/favorite/')
+def get_favorite_list():
+    endpoint = request.args.get('endpoint')
+    if not endpoint:
+        return incorrect_data_response('기기 등록 후에 이용해주세요'), 400
+
+    try:
+        user_favorite_info = db_users.find_one(
+            {'sub.endpoint': endpoint},
+            {'favorite': 1}
+        )
+        if not user_favorite_info:
+            return incorrect_data_response('기기가 등록되지 않았습니다.'), 400
+    except PyMongoError as pe:
+        log.error(pe)
+        return server_error('잠시 후 다시 이용해주세요'), 500
+    
+    favorite_list = user_favorite_info.get('favorite', [])
+    if not favorite_list:
+        return success_response('성공', data=[])
+    
+    try:
+        favorite_recipe = db_recipe.find(
+            {
+                '_id': {'$in': favorite_list}
+            },
+            {
+                'original_url': 0,
+            }
+        )
+    except PyMongoError as pe:
+        log.error(pe)
+        return server_error('잠시 후 다시 이용해주세요'), 500
+    
+    return success_response(
+        '성공',
+        data=list(favorite_recipe)
+    )
+        
+    
+    
 
 @bp_user.post('/favorite/')
 def set_favorite_recipe():

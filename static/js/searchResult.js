@@ -1,13 +1,15 @@
 import {
     promptAlertMsg,
-    createElementWithClass
+    createElementWithClass,
+    removeFadeOut,
+    getSubscriptionEndpoint
 } from './utils.js';
 
 const API_DOMAIN = 'http://myrefrigerator.store';
 
-const getSearchResult = async (formData) => {
+const getSearchResult = async (formData, forceCidx) => {
     const resultArea = document.querySelector('.recipe-list');
-    const cidx = resultArea.querySelectorAll('.recipe-item')?.length || 0;
+    const cidx = forceCidx ?? (resultArea.querySelectorAll('.recipe-item')?.length || 0);
 
     const response = await fetch(`${API_DOMAIN}/api/search/recipe/?${new URLSearchParams(formData).toString()}&cidx=${cidx}`);
     const respJson = await response.json();
@@ -29,7 +31,55 @@ const getSearchResult = async (formData) => {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+const getFavorites = async () => {
+    const resultArea = document.querySelector('#favorites');
+
+    const response = await fetch(`${API_DOMAIN}/api/user/favorite/?endpoint=${await getSubscriptionEndpoint()}`);
+    const respJson = await response.json();
+    if (respJson.resp_code === 'RET000') {
+        promptAlertMsg('info', respJson?.server_msg);
+        const recipeData = respJson?.data;
+        if (!recipeData || recipeData.length === 0) {
+            resultArea.textContent = '즐겨찾기한 레시피가 없습니다.';
+            return;
+        }
+
+        recipeData.forEach((recipe) => {
+            const recipeItem = renderSearchResultList(recipe);
+            resultArea.appendChild(recipeItem);
+        });
+    } else {
+        promptAlertMsg('warn', respJson?.server_msg || '검색 결과를 가져오는데 실패했습니다.');
+    }
+}
+
+const addSeeMoreButtonRecursive = (formData) => {
+    const resultArea = document.querySelector('.recipe-list');
+    const seeMoreButton = createElementWithClass('button', [], '더보기 ▼');
+    seeMoreButton.style.backgroundColor = 'transparent';
+    seeMoreButton.style.border = 'none';
+    seeMoreButton.style.cursor = 'pointer';
+    seeMoreButton.style.margin = '10px auto';
+    seeMoreButton.style.display = 'block';
+    seeMoreButton.style.width = '100%';
+    seeMoreButton.style.height = '50px';
+    seeMoreButton.style.fontSize = '1rem';
+    seeMoreButton.style.color = 'var(--primary-color)';
+    seeMoreButton.style.transition = 'all 0.3s ease-in-out';
+    seeMoreButton.style.transform = 'translateY(20px) scale(0.9)';
+
+    setTimeout(() => {
+        resultArea.appendChild(seeMoreButton);
+    }, 1500);
+    seeMoreButton.onclick = () => {
+        getSearchResult(formData);
+        addSeeMoreButtonRecursive(formData);
+        removeFadeOut(seeMoreButton);
+    }
+
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => {
         document.querySelector('.tab-link').click();
     }, 100);
@@ -49,8 +99,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        getSearchResult(formData);
+        getSearchResult(formData, 0);
+        addSeeMoreButtonRecursive(formData);
     }
+
+    await getFavorites();
 });
 
 const renderDefaultSearchArea = () => {

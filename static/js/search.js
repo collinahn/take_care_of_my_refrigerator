@@ -5,7 +5,7 @@ function activateTab(evt, tabName) {
     // Get all elements with class="tab-link" and remove the class "active"
     tablinks = document.getElementsByClassName("tab-link");
     for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
+        tablinks[i].classList.remove("active");
     }
 
     // Hide all content boxes
@@ -19,4 +19,10 @@ function activateTab(evt, tabName) {
 
     // Show the current tab
     document.getElementById(tabName).style.display = "block";
+    if (tabName !== "search") {
+        document.getElementById("search-interaction").style.display = "none";
+    }
+    else {
+        document.getElementById("search-interaction").style.display = "block";
+    }
 }
