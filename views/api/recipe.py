@@ -2,6 +2,7 @@ import json
 import time
 from flask import Blueprint, request
 from pymongo.errors import PyMongoError
+from bson import ObjectId
 
 from db.mongo import db_users, db_recipe
 from utils.pwa_push import PushMsgFormat, PushSettings
@@ -20,7 +21,7 @@ def recipe(recipe_id):
     
     try:
         recipe_info = db_recipe['recipes'].find_one(
-            {'_id': recipe_id},
+            {'_id': ObjectId(recipe_id)},
             {
                 'original_url': 0,
             }
@@ -33,3 +34,32 @@ def recipe(recipe_id):
     
     
     return success_response('성공', data=recipe_info)
+
+
+@bp_recipe.get('/bulk/')
+def bulk_recipe():
+    if 'ids' not in request.args:
+        return incorrect_data_response('잘못된 요청'), 403
+    
+    recipe_ids = request.args.get('ids')
+    if not recipe_ids:
+        return incorrect_data_response('요청하신 레시피가 없습니다'), 400
+    
+    recipes = recipe_ids.split('|')
+    
+    try:
+        recipes = db_recipe['recipes'].find(
+            {
+                '_id': {'$in': [ObjectId(recipe_id) for recipe_id in recipes]}
+            },
+            {
+                'original_url': 0,
+            }
+        )
+        if not recipes:
+            return incorrect_data_response('no recipe found'), 400
+    except PyMongoError as pe:
+        log.error(pe)
+        return server_error()
+    
+    return success_response('성공', data=list(recipes))

@@ -37,3 +37,61 @@ window.onload = function() {
         button.addEventListener('click', removeRecipe);
     });
 };
+
+
+
+const API_DOMAIN = 'http://myrefrigerator.store';
+
+const getCurrentId = () =>
+  window.location.pathname.replace(/\/$/, "").split("/").pop();
+
+const getLastKeys = (ingredients) => {
+    const lastKeys = [];
+
+    for (const category in ingredients) {
+        const items = ingredients?.[category];
+        if (!items) {
+            continue;
+        }
+        items.forEach(item => {
+        const keys = Object.keys(item);
+        if (keys.length > 0) {
+            lastKeys.push(keys[keys.length - 1]);
+        }
+        });
+    }
+
+    return lastKeys;
+}
+const getSearchResult = async (formData) => {
+    const resultArea = document.querySelector('.recipe-card')
+    const titleH3 = resultArea.querySelector('#recipe-title');
+    const recipeThumbnail = resultArea.querySelector('#recipe-thumb');
+    const ingredientList = resultArea.querySelector('#ingredients-list');
+    const recipeStep = resultArea.querySelector('#recipe-step');
+    
+
+    const response = await fetch(`${API_DOMAIN}/api/recipe/${getCurrentId()}/`);
+    const respJson = await response.json();
+    if (respJson.resp_code === 'RET000') {
+        const recipeData = respJson.data
+        titleH3.innerText = recipeData.title;
+        recipeThumbnail.src = recipeData.image;
+        getLastKeys(recipeData.ingredients).forEach(ingredient => {
+            const ingredientLi = document.createElement('li');
+            ingredientLi.innerText = `✔️ ${ingredient}`;
+            ingredientList.appendChild(ingredientLi);
+        });
+        recipeData.recipe.forEach((step, idx) => {
+            const recipeStepLi = document.createElement('li');
+            recipeStepLi.innerText = `${step}`;
+            recipeStep.appendChild(recipeStepLi);
+        });
+    } else {
+        titleH3.innerText = respJson.server_msg;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    getSearchResult();
+});
