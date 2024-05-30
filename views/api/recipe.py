@@ -18,6 +18,9 @@ def recipe(recipe_id):
     if not recipe_id:
         return incorrect_data_response('recipe_id is required')
     
+    user_favorite_info = None
+    endpoint = request.args.get('endpoint')
+    
     try:
         recipe_info = db_recipe.find_one(
             {'_id': recipe_id},
@@ -25,6 +28,11 @@ def recipe(recipe_id):
                 'original_url': 0,
             }
         )
+        if endpoint:
+            user_favorite_info = db_users.find_one(
+                {'sub.endpoint': endpoint},
+                {'favorite': 1}
+            )
         if not recipe_info:
             return incorrect_data_response('no recipe found'), 400
     except PyMongoError as pe:
@@ -32,7 +40,10 @@ def recipe(recipe_id):
         return server_error()
     
     
-    return success_response('성공', data=recipe_info)
+    return success_response('성공', data={
+        **recipe_info,
+        'favorite': recipe_id in user_favorite_info.get('favorite', [])
+    })
 
 
 @bp_recipe.get('/bulk/')
@@ -46,6 +57,9 @@ def bulk_recipe():
     
     recipes = recipe_ids.split('|')
     
+    user_favorite_info = None
+    endpoint = request.args.get('endpoint')
+    
     try:
         recipes = db_recipe.find(
             {
@@ -55,10 +69,20 @@ def bulk_recipe():
                 'original_url': 0,
             }
         )
+        if endpoint:
+            user_favorite_info = db_users.find_one(
+                {'sub.endpoint': endpoint},
+                {'favorite': 1}
+            )
         if not recipes:
             return incorrect_data_response('no recipe found'), 400
     except PyMongoError as pe:
         log.error(pe)
         return server_error()
     
-    return success_response('성공', data=list(recipes))
+    return success_response('성공', data=[
+        {
+            **recipe,
+            'favorite': recipe['_id'] in user_favorite_info.get('favorite', [])
+        } for recipe in recipes
+    ])

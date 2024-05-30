@@ -82,3 +82,65 @@ def set_user_preference(settings_key: str):
         return incorrect_data_response('변경 사항이 없습니다.'), 400 
     
     return success_response('성공')
+
+
+@bp_user.post('/favorite/')
+def set_favorite_recipe():
+    request_body =  request.get_json(silent=True) or {}
+    if request_body.get('endpoint') is None:
+        return incorrect_data_response('기기 등록 후에 이용해주세요'), 400
+    
+    recipe_id = request_body.get('recipe_id')
+    if recipe_id is None:
+        return incorrect_data_response('잘못된 요청'), 400
+    
+    try:
+        updated_res = db_users.update_one(
+            {
+                'sub.endpoint': request_body['endpoint']
+            },
+            {
+                '$push': {
+                    'favorite': recipe_id
+                }
+            }
+        )
+    except PyMongoError as pe:
+        log.error(pe)
+        return server_error('잠시 후 다시 이용해주세요'), 500
+    
+    if updated_res.modified_count == 0:
+        return incorrect_data_response('변경 사항이 없습니다.'), 400
+    
+    return success_response('성공')
+
+
+@bp_user.delete('/favorite/')
+def delete_favorite_recipe():
+    if request.args.get('endpoint') is None:
+        return incorrect_data_response('기기 등록 후에 이용해주세요'), 400
+
+    recipe_id = request.args.get('recipe_id')
+    if recipe_id is None:
+        return incorrect_data_response('잘못된 요청'), 400
+    
+    try:
+        updated_res = db_users.update_one(
+            {
+                'sub.endpoint': request.args['endpoint']
+            },
+            {
+                '$pull': {
+                    'favorite': recipe_id
+                }
+            }
+        )
+    except PyMongoError as pe:
+        log.error(pe)
+        return server_error('잠시 후 다시 이용해주세요'), 500
+    
+    if updated_res.modified_count == 0:
+        return incorrect_data_response('변경 사항이 없습니다.'), 400
+    
+    return success_response('성공')
+    
