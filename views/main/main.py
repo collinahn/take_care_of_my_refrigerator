@@ -47,6 +47,11 @@ def refrigerator():
     server_log.info(log_visitor_msg())
     return render_template('refrigerator.html'), 200
 
+@bp_main.get('/calender/')
+def calender():
+    server_log.info(log_visitor_msg())
+    return render_template('calendar.html'), 200
+
 @bp_main.get('/settings/')
 def push_settings():
     server_log.info(log_visitor_msg())
