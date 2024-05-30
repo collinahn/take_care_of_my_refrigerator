@@ -183,27 +183,45 @@
                 <button class="tab-link" onclick="activateTab(event, 'recent')">최근 본 레시피</button>
             </div>
             <hr>
-            <div id="search" class="content-box">
-                <form class="search-form">
-                    <div class="form-group">
-                        <label for="recipeName">요리명</label>
-                        <input type="text" id="recipeName" name="title" placeholder="입력하세요.">
+            <div id="search-interaction">
+                <div id="search" class="content-box">
+                    <form class="search-form">
+                        <div class="form-group">
+                            <label for="recipeName">요리명</label>
+                            <input type="text" id="recipeName" name="title" placeholder="입력하세요.">
+                        </div>
+                        <div class="form-group">
+                            <label for="keyword">선호 키워드 (재료, 카테고리 등)</label>
+                            <input type="text" id="keyword" name="keyword" placeholder="입력하세요.">
+                        </div>
+                        <p>*요리명 혹은 키워드 하나 이상 입력 필수</p>
+                        <button type="submit" class="search-button">
+                            <img src="/resources/search.png" alt="Search">
+                        </button>
+                    </form>
+                    <div id="result"> </div>
+                </div>
+                <div class="filter-container" style="display: none;">
+                    <div class="filter">
+                        <select id="filter">
+                            <option value="등록순">구비재료순</option>
+                            <option value="유통기한순">소요시간순</option>
+                            <option value="카테고리순">관련도순</option>
+                        </select>
                     </div>
-                    <div class="form-group">
-                        <label for="keyword">선호 키워드 (재료, 카테고리 등)</label>
-                        <input type="text" id="keyword" name="keyword" placeholder="입력하세요.">
-                    </div>
-                    <p>*요리명 혹은 키워드 하나 이상 입력 필수</p>
-                    <button type="submit" class="search-button">
-                        <img src="/resources/search.png" alt="Search">
-                    </button>
-                </form>
-                <div id="result"> </div>
+                    <button class="search"><img src="/resources/search.png" alt="Search Icon"></button>
+                </div>
             </div>
             <div id="favorites" class="content-box" style="display:none;">
             </div>
             <div id="recent" class="content-box" style="display:none;">
             </div>
+
+            <section class="content">
+                <div class="recipe-list">
+                    <!--다른 레시피-->
+                </div>
+            </section>
         </main>
         <script type="module" src="/js/utils.js"></script>
         <script type="module" src="/js/searchResult.js"></script>

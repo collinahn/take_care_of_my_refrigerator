@@ -21,6 +21,9 @@ def recipe(recipe_id):
     try:
         recipe_info = db_recipe['recipes'].find_one(
             {'_id': recipe_id},
+            {
+                'original_url': 0,
+            }
         )
         if not recipe_info:
             return incorrect_data_response('no recipe found'), 400
