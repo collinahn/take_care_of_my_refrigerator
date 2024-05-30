@@ -30,7 +30,7 @@ def search_recipe():
     title = request.args.get('title')
     keyword = request.args.get('keyword')
     endpoint = request.args.get('endpoint')
-    cidx = request.args.get('cidx', 0)
+    cidx = int(request.args.get('cidx', 0))
     
     try:
         _searched_recipe = list(db_recipe.find(
@@ -41,6 +41,12 @@ def search_recipe():
                 'title': 1,
                 'image': 1,
                 'url': 1,
+                'cook_time': 1,
+                'portion': 1,
+                'ingredients': 1,
+                'tags': 1,
+                'ingred': 1,
+                'difficulty': 1,
                 'score': {'$meta': 'textScore'}
             }
         ).sort([('score', {'$meta': 'textScore'})]).skip(cidx).limit(20))
