@@ -59,12 +59,10 @@ def can_cook_recipe():
   top_30 = sorted_recipe.head(30)
   return top_30[['Menu', 'temp','loss']]
 
-
+# 토큰화 데이터 불러오기 
 train = pd.read_excel('/content/drive/MyDrive/Colab Notebooks/종합설계/train_recipe(1글자포함).xlsx')
-train
-
 train['token'] = train['token'].apply(literal_eval)
-train_head = train.head(9700)
+test = train.head(9700)
 
 # 모델 불러오기
 model = joblib.load('/content/drive/MyDrive/Colab Notebooks/종합설계/saved_model.pkl')
@@ -72,9 +70,9 @@ model = joblib.load('/content/drive/MyDrive/Colab Notebooks/종합�
 # 키워드 입력 후 유사도 순으로 정렬된 레시피 반환함수
 def keyword_recipe():
     keyword = input("키워드를 입력하세요 : ")
-    train_head['max_similarity'] = train_head['token'].apply(lambda tokens: max([model.wv.similarity(keyword, token) for token in tokens]))    
+    test['max_similarity'] = test['token'].apply(lambda tokens: max([model.wv.similarity(keyword, token) for token in tokens]))    
     # 상위 30개 결과 출력
-    result = train_head.sort_values(by = 'max_similarity', ascending=False)
+    result = test_head.sort_values(by = 'max_similarity', ascending=False)
     result = result.head(30)
     # result[['Menu','Description','Tags','token']]
     return result['Menu']
