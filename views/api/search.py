@@ -33,7 +33,7 @@ def search_recipe():
     cidx = int(request.args.get('cidx', 0))
     sort = request.args.get('sort', 'DEFAULT')
     sort_method = ()
-    if sort == "COOK_TIME":
+    if sort == "COOKTIME":
         sort_method = (
             'cook_time', 1
         )
