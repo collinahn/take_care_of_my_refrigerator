@@ -67,17 +67,15 @@ train['token'] = train['token'].apply(literal_eval)
 train_head = train.head(9700)
 
 # 모델 불러오기
-
 model = joblib.load('/content/drive/MyDrive/Colab Notebooks/종합설계/saved_model.pkl')
 
 # 키워드 입력 후 유사도 순으로 정렬된 레시피 반환함수
-def recommend_recipe():
+def keyword_recipe():
     keyword = input("키워드를 입력하세요 : ")
-    train_head['max_similarity'] = train_head['token'].apply(lambda tokens: max([model.wv.similarity(keyword, token) for token in tokens]))
-    
-    # 상위 23개 결과 출력
+    train_head['max_similarity'] = train_head['token'].apply(lambda tokens: max([model.wv.similarity(keyword, token) for token in tokens]))    
+    # 상위 30개 결과 출력
     result = train_head.sort_values(by = 'max_similarity', ascending=False)
     result = result.head(30)
     # result[['Menu','Description','Tags','token']]
     return result['Menu']
-    
+
