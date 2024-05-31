@@ -7,9 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/10Mn1s14qCC7CKWF63fJqm42TeVu3Fv3U
 """
 
-from google.colab import drive
-drive.mount('/content/drive')
-
 !pip install konlpy
 !pip install fasttext
 
@@ -26,7 +23,7 @@ from tqdm import tqdm
 import joblib
 
 data = pd.read_excel('/content/drive/MyDrive/Colab Notebooks/종합설계/input_recipe.xlsx')
-data
+
 
 # 문자열 상태 변경(문자열 -> 리스트로)
 data['Recipe'] = data['Recipe'].apply(literal_eval)
@@ -35,12 +32,11 @@ data['Ingredients'] = data['Ingredients'].apply(literal_eval)
 data['temp'] = data['Ingred'].apply(literal_eval)
 data['Ingred'] = data['Ingred'].apply(literal_eval)
 
-data
 
 # 내 재료 리스트
 my_ingred = ['계란','간장','다진마늘','참기름','고춧가루','고추장','된장']
 
-# 재료를 기반으로 현재 가능한 레시피 반환
+# 재료를 기반으로 현재 가능한 레시피 반환함수
 def can_cook_recipe():
   # 레시피 초기화
   recipe = data.copy()
@@ -63,30 +59,25 @@ def can_cook_recipe():
   top_30 = sorted_recipe.head(30)
   return top_30[['Menu', 'temp','loss']]
 
-can_cook_recipe()
 
 train = pd.read_excel('/content/drive/MyDrive/Colab Notebooks/종합설계/train_recipe(1글자포함).xlsx')
 train
 
 train['token'] = train['token'].apply(literal_eval)
-
 train_head = train.head(9700)
 
-# 모델선언 & 토큰학습
-model = FastText(train['token'], sg = 1)
-
-import joblib
-joblib.dump(model, '/content/drive/MyDrive/Colab Notebooks/종합설계/saved_model.pkl')
+# 모델 불러오기
 
 model = joblib.load('/content/drive/MyDrive/Colab Notebooks/종합설계/saved_model.pkl')
 
-# 키워드 입력 후 유사도 순으로 레시피 정렬
-keyword = input("키워드를 입력하세요 : ")
-train_head['max_similarity'] = train_head['token'].apply(lambda tokens: max([model.wv.similarity(keyword, token) for token in tokens]))
-
-# 상위 23개 결과 출력
-result = train_head.sort_values(by = 'max_similarity', ascending=False)
-result = result.head(30)
-# result[['Menu','Description','Tags','token']]
-result['Menu']
-
+# 키워드 입력 후 유사도 순으로 정렬된 레시피 반환함수
+def recommend_recipe():
+    keyword = input("키워드를 입력하세요 : ")
+    train_head['max_similarity'] = train_head['token'].apply(lambda tokens: max([model.wv.similarity(keyword, token) for token in tokens]))
+    
+    # 상위 23개 결과 출력
+    result = train_head.sort_values(by = 'max_similarity', ascending=False)
+    result = result.head(30)
+    # result[['Menu','Description','Tags','token']]
+    return result['Menu']
+    
