@@ -57,7 +57,7 @@ def can_cook_recipe():
   sorted_recipe = recipe.sort_values(by='loss')
 
   top_30 = sorted_recipe.head(30)
-  return top_30[['Menu', 'temp','loss']]
+  return top_30[['ObjectId', 'temp','loss']]
 
 # 토큰화 데이터 불러오기 
 train = pd.read_excel('./model/train_recipe(1글자포함).xlsx')
@@ -75,5 +75,6 @@ def keyword_recipe():
     result = test.sort_values(by = 'max_similarity', ascending=False)
     result = result.head(30)
     # result[['Menu','Description','Tags','token']]
-    return result['Menu']
+    return result['ObjectId']
+    
 
