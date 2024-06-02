@@ -234,6 +234,62 @@
                     </div>
                 </div>
             </div>
+            <div class="add-item-sheet" id="addItemSheetModal">
+                <div class="sheet-overlay"></div>
+                <div class="content">
+                    <div class="header">
+                        <h2>추가</h2>
+                        <button type="submit" class="save-button">저장</button>
+                        <button class="close-sheet">&times;</button>
+                    </div>
+                    <div class="body">
+                        <form id="addItemForm">
+                            <div class="form-row">
+                                <label for="foodName">식재료명</label>
+                                <input type="text" id="foodName" name="foodName" required>
+                            </div>
+                            <div class="form-row">
+                                <label for="category">카테고리</label>
+                                <select id="storage" name="storage">
+                                    <option value="냉장">냉장</option>
+                                    <option value="냉동">냉동</option>
+                                    <option value="실온">실온</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label for="category">카테고리</label>
+                                <div class="category-container">
+                                    <select id="category" name="category">
+                                        <option value="과일류">과일류</option>
+                                        <option value="채소류">채소류</option>
+                                        <option value="육류">육류</option>
+                                        <option value="해산물">해산물</option>
+                                        <option value="유제품">유제품</option>
+                                        <option value="간식류">간식류</option>
+                                    </select>
+                                    <button type="button" id="addCategoryButton">+</button>
+                                </div>
+                                <input type="text" id="newCategory" name="newCategory" placeholder="새 카테고리 입력" style="display: none;">
+                            </div>
+                            <div class="form-row">
+                                <label for="expiryDate">유통기한</label>
+                                <input type="date" id="expiryDate" name="expiryDate" required>
+                            </div>
+                            <div class="form-row">
+                                <label for="quantity">수량</label>
+                                <div class="quantity-container">
+                                    <input type="number" id="quantity" name="quantity" required>
+                                    <select id="quantityUnit" name="quantityUnit">
+                                        <option value="pcs">pcs</option>
+                                        <option value="g">g</option>
+                                        <option value="ml">ml</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>                                                               
         </main>
         <footer>
             <p>Copyright &copy; HUFS SW&AI Capstone Design A4용지. All Rights Reserved.</p>

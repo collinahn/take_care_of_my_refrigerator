@@ -66,6 +66,11 @@ hr {
     border: none;
 }
 
+.filter label,
+.filter select {
+    display: inline-block;
+}
+
 #filter {
     font-size: 16px;
     border: none;
@@ -149,6 +154,119 @@ hr {
     background-color: transparent;
     text-decoration: underline;
     padding: 0;
+}
+
+.add-item-sheet {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.4);
+    transition: height 0.3s ease-out;
+}
+
+.add-item-sheet.active {
+    height: 100%;
+}
+
+.add-item-sheet .content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #FAFAF5;
+    margin: 0 10px;
+    margin-bottom: -15px;
+    padding: 20px;
+    border-radius: 30px 30px 0 0;
+    z-index: 2;
+}
+
+.add-item-sheet .header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.add-item-sheet .header h2 {
+    margin: 0 10px;
+    margin-right: auto;
+}
+
+.add-item-sheet .header button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.add-item-sheet .header .save-button {
+    color: black;
+    font-weight: bold;
+    padding: 6px 12px;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.add-item-sheet .body {
+    margin-top: 10px;
+}
+
+.add-item-sheet .body .form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.add-item-sheet .body .form-row label {
+    width: 30%;
+    margin-right: 10px;
+}
+
+.add-item-sheet .body .form-row input,
+.add-item-sheet .body .form-row select {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    background-color: rgba(66, 107, 31, 0.1);
+}
+
+.add-item-sheet .category-container {
+    display: flex;
+    gap: 10px;
+}
+
+.add-item-sheet .category-container select {
+    flex: 1;
+}
+
+.add-item-sheet .quantity-container {
+    display: flex;
+    gap: 10px;
+}
+
+.add-item-sheet .quantity-container input {
+    flex: 1;
+}
+
+.add-item-sheet .quantity-container select {
+    width: 60px;
+}
+
+.add-item-sheet .body button {
+    width: 100%;
+    background-color: rgba(66, 107, 31, 0.8);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
 }
 
 footer p {
