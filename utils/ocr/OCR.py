@@ -53,7 +53,7 @@ def extract_text_from_image(image_path):
     return text
 
 # 테스트할 이미지 경로
-image_path = '/Users/minizi/Desktop/IMG_5964.jpg'
+image_path = 'IMG_5964.jpg'
 
 # 텍스트 추출
 extracted_text = extract_text_from_image(image_path)
