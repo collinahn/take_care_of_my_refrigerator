@@ -18,14 +18,19 @@ function activateTab(evt, tabName) {
     evt.currentTarget.className += " active";
 
     // Show the current tab
-    document.getElementById(tabName).style.display = "block";
-    if (tabName !== "search") {
-        document.getElementById("search-interaction").style.display = "none";
-    }
-    else {
+    if (tabName === "search") {
         document.getElementById("search-interaction").style.display = "block";
         if (document.querySelector('.recipe-list')?.children?.length !== 0) {
             document.getElementById("search").style.display = "none";
+        } else {
+            document.getElementById("search").style.display = "block";
         }
+    } else {
+        document.getElementById("search-interaction").style.display = "none";
+    }
+
+    // Only show the content box if it is the search tab
+    if (tabName === "search") {
+        document.getElementById(tabName).style.display = "block";
     }
 }

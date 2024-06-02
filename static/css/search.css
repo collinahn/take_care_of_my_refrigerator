@@ -55,9 +55,13 @@ hr {
 
 .content-box {
     display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     flex-grow: 1;
-    margin: 0 53px;
-    margin-top: 35px;
+    margin: 0 20px;
+    margin-top: 20px;
+    max-width: 700px;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 30px;
@@ -69,7 +73,7 @@ hr {
 }
 
 .content-box.active {
-    display: block;
+    display: flex;
 }
 
 #search-interaction {
@@ -173,6 +177,238 @@ p {
     border: 1px solid #ddd;
     padding: 10px;
     margin: 0 40px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.food-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.food-details {
+    margin-left: 20px;
+    flex-grow: 1;
+}
+
+.food-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.food-name {
+    color: black;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.cook-time {
+    font-size: 14px;
+    color: #666;
+    margin-right: 30px;
+}
+
+.ingredient-list {
+    font-size: 14px;
+    color: #333;
+}
+
+.no-ingredient {
+    color: red;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+footer p {
+    color: #426B1F;
+    font-size: 12px;
+    padding: 10px;
+    margin-top: 100px;
+    text-align: center;
+}body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo img {
+    width: 80px;
+    height: auto;
+    margin-top: 15px;
+    margin-left: 20px;
+}
+
+.menu {
+    display: flex;
+}
+
+.menu a {
+    text-decoration: none;
+    color: black;
+    padding: 10px;
+}
+
+.tab-menu {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-around;
+    background-color: white;
+}
+
+.tab-link {
+    border: none;
+    outline: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: inherit;
+    font-size: 16px;
+}
+
+.tab-link.active {
+    font-weight: bold;
+    background-color: rgba(66, 107, 31, 0.3);
+    color: black;
+}
+
+hr {
+    margin: 0 53px;
+}
+
+.content-box {
+    display: none;
+    flex-grow: 1;
+    margin: 0 20px;
+    margin-top: 20px;
+    max-width: 700px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 30px;
+    min-height: 200px;
+    position: relative;
+    background-color: #FAFAF5;
+    font-weight: bold;
+    transition: all 0.5s ease-in-out;
+}
+
+.content-box.active {
+    display: block;
+}
+
+#search-interaction {
+    display: flex;
+    flex-direction: row;
+    height: 270px;
+    transition: all 0.5s ease-in-out;
+}
+
+.search-form {
+    display: flex;
+    flex-direction: column;
+    transition: all 0.5s ease-in-out;
+    max-height: 200px;
+}
+
+.form-group {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    background-color: #FAFAF5;
+    border: none;
+}
+
+.search-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 0;
+}
+
+.search-button img {
+    width: 24px;
+    height: auto;
+}
+
+p {
+    font-size: 12px;
+    color: #426B1F;
+}
+
+
+.filter-container {
+    margin: 0 10px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    max-height: 100px;
+    flex-grow: 1;
+    transition: all 0.5s ease-in-out;
+}
+
+.filter select {
+    padding: 5px 10px;
+    margin-right: 10px;
+    border: none;
+}
+
+.search img {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
+.search {
+    margin-right: 20px;
+    border: none;
+    background-color: transparent;
+    max-height: 300px;
+    transition: all 0.5s ease-in-out;
+}
+
+.recipe-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.recipe-item {
+    display: flex;
+    align-items: center;
+    background-color: rgba(66, 107, 31, 0.2);
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 0 15px;
     margin-bottom: 20px;
     position: relative;
 }

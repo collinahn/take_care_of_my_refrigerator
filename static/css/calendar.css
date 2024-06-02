@@ -47,9 +47,9 @@ header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 10px;
-    padding: 0 20px;
-    margin: 0 50px;
-    margin-top: 50px;
+    padding: 0px;
+    margin: 10px;
+    margin-top: 0px;
 }
 
 .day {
@@ -78,7 +78,7 @@ header {
 
 .item-list {
     padding: 20px;
-    margin: 0 70px;
+    margin: 0 20px;
     background-color: rgba(66, 107, 31, 0.2);
 }
 

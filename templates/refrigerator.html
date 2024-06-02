@@ -158,6 +158,7 @@
 
 
         <link rel="stylesheet" href="/css/refrigerator.css" />
+        <link rel="stylesheet" href="/css/bottom_sheet.css" />
 
     </head>
 
@@ -169,6 +170,7 @@
                 </a>
             </div>
             <div class="menu">
+                <a href="/calender">캘린더</a>
                 <a href="/search">레시피</a>
                 <a href="/settings">프로필</a>
             </div>
@@ -237,6 +239,34 @@
             <p>Copyright &copy; HUFS SW&AI Capstone Design A4용지. All Rights Reserved.</p>
         </footer>
         <script src="/js/ref_script.js"></script>
+ 
+        <div class="bottom-sheet">
+            <div class="sheet-overlay"></div>
+            <div class="content">
+                <div class="header">
+                    <div class="drag-icon"><span></span></div>
+                </div>
+                <div class="body" id="notification_modal_body">
+                    <h3>사용자 데이터를 불러오는 중 ...</h3>
+                </div>
+            </div>
+        </div>
+
+        <script src="/js/bottom_sheet.js"></script>
+        <script id="enable-bsmodal">
+            enableBottomSheet(() => {
+                if (!isNotificationGranted()) {
+                    onClickGetPermission()
+                    return
+                } else {
+                    onClickGetPermission()
+                }
+                setupUserPreferenceSettings();
+            })
+        </script>
+
+        <div id="myref_alert"></div>
+
     </body>
 
 </html>
