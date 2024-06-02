@@ -34,30 +34,52 @@ data['Ingred'] = data['Ingred'].apply(literal_eval)
 
 
 # 내 재료 리스트
-my_ingred = ['계란','간장','다진마늘','참기름','고춧가루','고추장','된장']
+my_ingred = ['소고기다짐육', '양파', '빨강파프리카', '노랑파프리카', '팽이버섯', '깻잎', '간장', '물', '식초', '설탕', '다진마늘', '연겨자', '소금', '후추']
+
+# 대분류 처리
+category = {
+    "돼지고기": ["돼지고기앞다리살", "돼지고기뒷다리살", "돼지고기다짐육"],
+    "소고기" : ["소고기양지","소고기부채살","소고기다짐육"],
+    "버섯": ["느타리버섯", "팽이버섯", "목이버섯"],
+    "견과류": ["호두", "땅콩", "잣"],
+    "밥": ["쌀밥(즉석밥)", "현미밥"]
+}
 
 # 재료를 기반으로 현재 가능한 레시피 반환함수
 def can_cook_recipe():
-  # 레시피 초기화
-  recipe = data.copy()
-  for i, ingredients in enumerate(recipe['Ingred']):
-      for my in my_ingred:
-          if my in ingredients:
-              # 있는 재료 temp에서 삭제
-              recipe.at[i, 'temp'] = [ing for ing in recipe.at[i, 'temp'] if ing != my]
-          else:
-            # 텍스트 포함된 재료 temp에서 삭제
-            for s in ingredients:
-              if my in s:
-                recipe.at[i, 'temp'] = [ing for ing in recipe.at[i, 'temp'] if ing != s]
+    # 레시피 초기화
+    recipe = data.copy()
+    
+    for i, ingredients in enumerate(recipe['Ingred']):
+        for my in my_ingred:
+            # 1. my가 ingredients에 있다면 temp에서 삭제
+            if my in ingredients: 
+                recipe.at[i, 'temp'] = [ing for ing in recipe.at[i, 'temp'] if ing != my]
 
-  recipe['loss'] = recipe['temp'].apply(len)
+            # 2. 대분류 처리 : my가 category에 있다면 키를 temp에서 삭제(ex. 돼지고기뒷다리살 보유 -> temp에서 돼지고기 삭제)
+            elif any(my in values for values in category.values()):
+                for key, values in category.items():
+                    if my in values:
+                        recipe.at[i, 'temp'] = [ing for ing in recipe.at[i, 'temp'] if ing != key]
+            
+            # 3. or 처리 : my가 or로 연결된 재료중 하나라면 temp에서 삭제(ex. 소주 보유 -> temp에서 소주or청주 삭제)
+            elif any('or' in s for s in ingredients):
+                # ingredients의 요소 중 'or'를 포함하는 요소가 있을 때
+                for s in ingredients:
+                    if 'or' in s:
+                        # 'or'로 분리된 모든 문자열 중 하나와 my가 일치하는지 확인
+                        parts = [part.strip() for part in s.split('or')]
+                        if my in parts:
+                            recipe.at[i, 'temp'] = [ing for ing in recipe.at[i, 'temp'] if ing != s]
 
-  # loss(부족한 재료 수)가 작은 순 정렬
-  sorted_recipe = recipe.sort_values(by='loss')
+    recipe['loss'] = recipe['temp'].apply(len)
 
-  top_30 = sorted_recipe.head(30)
-  return top_30[['ObjectId', 'temp','loss']]
+    # loss(부족한 재료 수)가 작은 순 정렬
+    sorted_recipe = recipe.sort_values(by='loss')
+
+    top_30 = sorted_recipe.head(30)
+    return top_30[['ObjectId', 'temp', 'loss']]
+
 
 # 토큰화 데이터 불러오기 
 train = pd.read_excel('./model/train_recipe(1글자포함).xlsx')
