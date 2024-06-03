@@ -76,14 +76,19 @@ hr {
     border: none;
 }
 
-.add {
+.content .add {
     border: none;
     background-color: transparent;
     color: #426B1F;
     font-size: 35px;
     cursor: pointer;
-    padding: 0.25rem 0.75rem;
+    padding: 0.25rem 0.55rem;
+    font-size: 20px;
 }
+.add:hover {
+    color: white;
+}
+
 
 .items {
     list-style: none;

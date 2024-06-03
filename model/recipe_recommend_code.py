@@ -13,13 +13,13 @@ Original file is located at
 import pandas as pd
 import numpy as np
 from ast import literal_eval
-# import io
-# import re
-# from konlpy.tag import Hannanum, Kkma, Komoran, Mecab, Okt
-# from gensim.models import Word2Vec, FastText
-# from gensim.models.fasttext import load_facebook_model
-# from gensim import models
-# from tqdm import tqdm
+import io
+import re
+from konlpy.tag import Hannanum, Kkma, Komoran, Mecab, Okt
+from gensim.models import Word2Vec, FastText
+from gensim.models.fasttext import load_facebook_model
+from gensim import models
+from tqdm import tqdm
 import joblib
 
 data = pd.read_excel('./model/input_recipe.xlsx')
@@ -100,3 +100,5 @@ def keyword_recipe():
     return result['ObjectId']
     
 
+
+print(can_cook_recipe())

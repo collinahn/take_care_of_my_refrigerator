@@ -192,7 +192,7 @@
                         <option value="유통기한순">유통기한순</option>
                         <option value="카테고리순">카테고리순</option>
                     </select>
-                    <button class="add">+</button>
+                    <button class="show-modal add">+</button>
                 </div>
                 <ul class="items">
                     <li class="item">
@@ -234,13 +234,16 @@
                     </div>
                 </div>
             </div>
-            <div class="add-item-sheet" id="addItemSheetModal">
+            <div class="add-item-sheet bottom-sheet" id="addItemSheetModal">
                 <div class="sheet-overlay"></div>
                 <div class="content">
                     <div class="header">
+                        <div class="drag-icon"><span></span></div>
+                    </div>
+                    <div class="header">
                         <h2>추가</h2>
                         <button type="submit" class="save-button">저장</button>
-                        <button class="close-sheet">&times;</button>
+                        <button class="close-sheet" style="display: none;">&times;</button>
                     </div>
                     <div class="body">
                         <form id="addItemForm">
@@ -269,7 +272,8 @@
                                     </select>
                                     <button type="button" id="addCategoryButton">+</button>
                                 </div>
-                                <input type="text" id="newCategory" name="newCategory" placeholder="새 카테고리 입력" style="display: none;">
+                                <input type="text" id="newCategory" name="newCategory" placeholder="새 카테고리 입력"
+                                    style="display: none;">
                             </div>
                             <div class="form-row">
                                 <label for="expiryDate">유통기한</label>
@@ -289,35 +293,79 @@
                         </form>
                     </div>
                 </div>
-            </div>                                                               
+            </div>
         </main>
         <footer>
             <p>Copyright &copy; HUFS SW&AI Capstone Design A4용지. All Rights Reserved.</p>
         </footer>
         <script src="/js/ref_script.js"></script>
- 
-        <div class="bottom-sheet">
-            <div class="sheet-overlay"></div>
-            <div class="content">
-                <div class="header">
-                    <div class="drag-icon"><span></span></div>
-                </div>
-                <div class="body" id="notification_modal_body">
-                    <h3>사용자 데이터를 불러오는 중 ...</h3>
-                </div>
-            </div>
-        </div>
 
         <script src="/js/bottom_sheet.js"></script>
         <script id="enable-bsmodal">
             enableBottomSheet(() => {
-                if (!isNotificationGranted()) {
-                    onClickGetPermission()
-                    return
-                } else {
-                    onClickGetPermission()
-                }
-                setupUserPreferenceSettings();
+                const addItemSheet = document.getElementById('addItemSheetModal');
+                const closeModalButton = document.querySelector('.close-sheet');
+                const addItemForm = document.getElementById('addItemForm');
+                const addCategoryButton = document.getElementById('addCategoryButton');
+                const categorySelect = document.getElementById('category');
+                const newCategoryInput = document.getElementById('newCategory');
+
+                closeModalButton.addEventListener('click', () => {
+                    addItemSheet.classList.remove('active');
+                });
+
+                addItemSheet.addEventListener('click', (event) => {
+                    if (event.target.classList.contains('sheet-overlay')) {
+                        addItemSheet.classList.remove('active');
+                    }
+                });
+
+                addCategoryButton.addEventListener('click', () => {
+                    newCategoryInput.style.display = 'block';
+                    newCategoryInput.focus();
+                });
+
+                newCategoryInput.addEventListener('blur', () => {
+                    const newCategory = newCategoryInput.value.trim();
+                    if (newCategory) {
+                        const option = document.createElement('option');
+                        option.value = newCategory;
+                        option.text = newCategory;
+                        categorySelect.add(option);
+                        categorySelect.value = newCategory;
+                    }
+                    newCategoryInput.style.display = 'none';
+                    newCategoryInput.value = '';
+                });
+
+                addItemForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+
+                    const foodName = document.getElementById('foodName').value;
+                    const storage = document.getElementById('storage').value;
+                    const category = document.getElementById('category').value;
+                    const expiryDate = document.getElementById('expiryDate').value;
+                    const quantity = document.getElementById('quantity').value;
+                    const quantityUnit = document.getElementById('quantityUnit').value;
+
+                    const newItem = document.createElement('li');
+                    newItem.classList.add('item');
+                    newItem.setAttribute('data-category', category);
+
+                    newItem.innerHTML = `
+            <span class="category">${category}</span>
+            <span class="name">${foodName}</span>
+            <span class="expiry">${expiryDate} / ${quantity}${quantityUnit}</span>
+            <button class="edit">✏️</button>
+            <button class="delete">✕</button>
+        `;
+
+                    document.querySelector('.items').appendChild(newItem);
+
+                    addItemForm.reset();
+
+                    addItemSheet.classList.remove('active');
+                });
             })
         </script>
 
