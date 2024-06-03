@@ -240,13 +240,13 @@
                     <div class="header">
                         <div class="drag-icon"><span></span></div>
                     </div>
-                    <div class="header">
-                        <h2>추가</h2>
-                        <button type="submit" class="save-button">저장</button>
-                        <button class="close-sheet" style="display: none;">&times;</button>
-                    </div>
-                    <div class="body">
-                        <form id="addItemForm">
+                    <form id="addItemForm">
+                        <div class="header">
+                            <h2>추가</h2>
+                            <button type="submit" class="save-button">저장</button>
+                            <button class="close-sheet" style="display: none;">&times;</button>
+                        </div>
+                        <div class="body">
                             <div class="form-row">
                                 <label for="foodName">식재료명</label>
                                 <input type="text" id="foodName" name="foodName" required>
@@ -277,12 +277,12 @@
                             </div>
                             <div class="form-row">
                                 <label for="expiryDate">유통기한</label>
-                                <input type="date" id="expiryDate" name="expiryDate" required>
+                                <input type="date" id="expiryDate" name="expiryDate">
                             </div>
                             <div class="form-row">
                                 <label for="quantity">수량</label>
                                 <div class="quantity-container">
-                                    <input type="number" id="quantity" name="quantity" required>
+                                    <input type="number" id="quantity" name="quantity">
                                     <select id="quantityUnit" name="quantityUnit">
                                         <option value="pcs">pcs</option>
                                         <option value="g">g</option>
@@ -290,8 +290,8 @@
                                     </select>
                                 </div>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </main>
@@ -340,6 +340,7 @@
 
                 addItemForm.addEventListener('submit', (event) => {
                     event.preventDefault();
+                    console.log('submit' + event);
 
                     const foodName = document.getElementById('foodName').value;
                     const storage = document.getElementById('storage').value;
@@ -347,6 +348,10 @@
                     const expiryDate = document.getElementById('expiryDate').value;
                     const quantity = document.getElementById('quantity').value;
                     const quantityUnit = document.getElementById('quantityUnit').value;
+
+                    if (!foodName) {
+                        return
+                    }
 
                     const newItem = document.createElement('li');
                     newItem.classList.add('item');
@@ -357,14 +362,14 @@
             <span class="name">${foodName}</span>
             <span class="expiry">${expiryDate} / ${quantity}${quantityUnit}</span>
             <button class="edit">✏️</button>
-            <button class="delete">✕</button>
+            <button class="delete" onclick="(e => e.target.closest('.item').remove())(event)">✕</button>
         `;
 
                     document.querySelector('.items').appendChild(newItem);
 
                     addItemForm.reset();
+                    hideBottomSheet();
 
-                    addItemSheet.classList.remove('active');
                 });
             })
         </script>

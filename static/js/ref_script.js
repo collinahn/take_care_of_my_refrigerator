@@ -18,6 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function sortItems(category) {
+        return
+    }
+
     const deleteButtons = document.querySelectorAll('.delete');
     deleteButtons.forEach(button => {
         button.addEventListener('click', (event) => {
@@ -47,8 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     filterSelect.addEventListener('change', (event) => {
         const selectedFilter = event.target.value;
         // 필터링된 아이템들을 표시하는 함수 호출
-        updateItems(selectedFilter);
+        console.log(selectedFilter)
+        sortItems(selectedFilter);
     });
-
-
 });
