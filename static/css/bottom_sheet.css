@@ -97,3 +97,9 @@
   margin-top: 20px;
   font-size: 1.05rem;
 }
+.lock-position {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  -ms-touch-action: none;
+}
