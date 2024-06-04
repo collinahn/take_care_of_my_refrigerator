@@ -27,5 +27,6 @@ function activateTab(evt, tabName) {
         }
     } else {
         document.getElementById("search-interaction").style.display = "none";
+        document.getElementById(tabName).style.display = "block";
     }
 }
