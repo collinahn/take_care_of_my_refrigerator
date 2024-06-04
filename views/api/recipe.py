@@ -32,7 +32,7 @@ def recipe(recipe_id):
             user_favorite_info = db_users.find_one(
                 {'sub.endpoint': endpoint},
                 {'favorite': 1}
-            )
+            ) or {}
         if not recipe_info:
             return incorrect_data_response('no recipe found'), 400
     except PyMongoError as pe:

@@ -70,6 +70,8 @@ hr {
     background-color: #FAFAF5;
     font-weight: bold;
     transition: all 0.5s ease-in-out;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .content-box.active {
@@ -77,8 +79,7 @@ hr {
 }
 
 #search-interaction {
-    display: flex;
-    flex-direction: row;
+    display: block;
     height: 270px;
     transition: all 0.5s ease-in-out;
 }
@@ -136,6 +137,9 @@ p {
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
     max-height: 100px;
     flex-grow: 1;
     transition: all 0.5s ease-in-out;
@@ -292,58 +296,6 @@ hr {
     margin: 0 53px;
 }
 
-.content-box {
-    display: none;
-    flex-grow: 1;
-    margin: 0 20px;
-    margin-top: 20px;
-    max-width: 700px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 30px;
-    min-height: 200px;
-    position: relative;
-    background-color: #FAFAF5;
-    font-weight: bold;
-    transition: all 0.5s ease-in-out;
-}
-
-.content-box.active {
-    display: block;
-}
-
-#search-interaction {
-    display: flex;
-    flex-direction: row;
-    height: 270px;
-    transition: all 0.5s ease-in-out;
-}
-
-.search-form {
-    display: flex;
-    flex-direction: column;
-    transition: all 0.5s ease-in-out;
-    max-height: 200px;
-}
-
-.form-group {
-    margin-top: 10px;
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.form-group input[type="text"] {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-    background-color: #FAFAF5;
-    border: none;
-}
-
 .search-button {
     position: absolute;
     top: 15px;
@@ -364,24 +316,6 @@ p {
     color: #426B1F;
 }
 
-
-.filter-container {
-    margin: 0 10px;
-    margin-top: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 10px;
-    max-height: 100px;
-    flex-grow: 1;
-    transition: all 0.5s ease-in-out;
-}
-
-.filter select {
-    padding: 5px 10px;
-    margin-right: 10px;
-    border: none;
-}
 
 .search img {
     width: 25px;

@@ -28,9 +28,4 @@ function activateTab(evt, tabName) {
     } else {
         document.getElementById("search-interaction").style.display = "none";
     }
-
-    // Only show the content box if it is the search tab
-    if (tabName === "search") {
-        document.getElementById(tabName).style.display = "block";
-    }
 }
