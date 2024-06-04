@@ -700,7 +700,7 @@
                 if (navigator.userAgent.indexOf('everytimeApp') >= 0) throw new Error("에브리타임 인앱 브라우저에서는 알림을 받을 수 없습니다.\n다른 브라우저로 열기를 통해 기기의 브라우저에서 직접 열어주세요.\n");
             }
 
-            document.addEventListener("DOMContentLoaded", () => {
+            document.addEventListener("DOMContentLoaded", async () => {
                 try {
                     browserCheck()
                 } catch (err) {
@@ -710,6 +710,11 @@
                     else { // 안드로이드 접속 경우
                         const anchorChrome = 'intent://' + location.href.replace(/https?:\/\//i, '') + '#Intent;scheme=http;package=com.android.chrome;end';
                         promptAlertMsg("warn", err + '\n여기를 누르면 크롬 브라우저로 이동합니다', anchorChrome)
+                    }
+                }
+                if (isNotificationGranted() && await getSubscriptionEndpoint()) {
+                    if (window.location.search.indexOf("dest=home") === -1) {
+                        window.location.href = "/refrigerator"
                     }
                 }
             })
