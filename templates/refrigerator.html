@@ -248,14 +248,15 @@
                             <button class="close-sheet" style="display: none;">&times;</button>
                         </div>
                         <div class="body">
+                            <input type="hidden" id="ingredientInputId" name="id" value="">
                             <div class="form-row">
                                 <label for="foodName">식재료명</label>
-                                <input type="text" id="foodName" name="foodName" required>
+                                <input type="text" id="foodName" name="name" required>
                             </div>
                             <div class="form-row">
-                                <label for="category">카테고리</label>
-                                <select id="storage" name="storage">
-                                    <option value="냉장">냉장</option>
+                                <label for="storageOption">보관 방법</label>
+                                <select id="storageOption" name="storage">
+                                    <option selected value="냉장">냉장</option>
                                     <option value="냉동">냉동</option>
                                     <option value="실온">실온</option>
                                 </select>
@@ -264,7 +265,7 @@
                                 <label for="category">카테고리</label>
                                 <div class="category-container">
                                     <select id="category" name="category">
-                                        <option value="과일류">과일류</option>
+                                        <option selected="과일류">과일류</option>
                                         <option value="채소류">채소류</option>
                                         <option value="육류">육류</option>
                                         <option value="해산물">해산물</option>
@@ -273,7 +274,7 @@
                                     </select>
                                     <button type="button" id="addCategoryButton">+</button>
                                 </div>
-                                <input type="text" id="newCategory" name="newCategory" placeholder="새 카테고리 입력"
+                                <input type="text" id="newCategory" name="userInputCategory" placeholder="새 카테고리 입력"
                                     style="display: none;">
                             </div>
                             <div class="form-row">
@@ -283,9 +284,9 @@
                             <div class="form-row">
                                 <label for="quantity">수량</label>
                                 <div class="quantity-container">
-                                    <input type="number" id="quantity" name="quantity">
+                                    <input type="number" id="quantity" name="quantity" value="1">
                                     <select id="quantityUnit" name="quantityUnit">
-                                        <option value="pcs">pcs</option>
+                                        <option selected value="pcs">pcs</option>
                                         <option value="g">g</option>
                                         <option value="ml">ml</option>
                                     </select>
@@ -299,81 +300,9 @@
         <footer>
             <p>Copyright &copy; HUFS SW&AI Capstone Design A4용지. All Rights Reserved.</p>
         </footer>
-        <script src="/js/ref_script.js"></script>
-
         <script src="/js/bottom_sheet.js"></script>
-        <script id="enable-bsmodal">
-            enableBottomSheet(() => {
-                const addItemSheet = document.getElementById('addItemSheetModal');
-                const closeModalButton = document.querySelector('.close-sheet');
-                const addItemForm = document.getElementById('addItemForm');
-                const addCategoryButton = document.getElementById('addCategoryButton');
-                const categorySelect = document.getElementById('category');
-                const newCategoryInput = document.getElementById('newCategory');
-
-                closeModalButton.addEventListener('click', () => {
-                    addItemSheet.classList.remove('active');
-                });
-
-                addItemSheet.addEventListener('click', (event) => {
-                    if (event.target.classList.contains('sheet-overlay')) {
-                        addItemSheet.classList.remove('active');
-                    }
-                });
-
-                addCategoryButton.addEventListener('click', () => {
-                    newCategoryInput.style.display = 'block';
-                    newCategoryInput.focus();
-                });
-
-                newCategoryInput.addEventListener('blur', () => {
-                    const newCategory = newCategoryInput.value.trim();
-                    if (newCategory) {
-                        const option = document.createElement('option');
-                        option.value = newCategory;
-                        option.text = newCategory;
-                        categorySelect.add(option);
-                        categorySelect.value = newCategory;
-                    }
-                    newCategoryInput.style.display = 'none';
-                    newCategoryInput.value = '';
-                });
-
-                addItemForm.addEventListener('submit', (event) => {
-                    event.preventDefault();
-                    console.log('submit' + event);
-
-                    const foodName = document.getElementById('foodName').value;
-                    const storage = document.getElementById('storage').value;
-                    const category = document.getElementById('category').value;
-                    const expiryDate = document.getElementById('expiryDate').value;
-                    const quantity = document.getElementById('quantity').value;
-                    const quantityUnit = document.getElementById('quantityUnit').value;
-
-                    if (!foodName) {
-                        return
-                    }
-
-                    const newItem = document.createElement('li');
-                    newItem.classList.add('item');
-                    newItem.setAttribute('data-category', category);
-
-                    newItem.innerHTML = `
-            <span class="category">${category}</span>
-            <span class="name">${foodName}</span>
-            <span class="expiry">${expiryDate} / ${quantity}${quantityUnit}</span>
-            <button class="edit">✏️</button>
-            <button class="delete" onclick="(e => e.target.closest('.item').remove())(event)">✕</button>
-        `;
-
-                    document.querySelector('.items').appendChild(newItem);
-
-                    addItemForm.reset();
-                    hideBottomSheet();
-
-                });
-            })
-        </script>
+        <script type="module" src="/js/update_ref.js"></script>
+        <script src="/js/ref_script.js"></script>
 
         <div id="myref_alert"></div>
 

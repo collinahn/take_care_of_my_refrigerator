@@ -14,7 +14,8 @@ from utils.ingredients import (
     get_ingredients,
     add_ingredients, 
     update_ingredients, 
-    delete_ingredients
+    delete_ingredients,
+    validate_ingredients
 )
 
 bp_refrigerator = Blueprint('refrigerator', __name__, url_prefix='/api/refrigerator')
@@ -39,11 +40,16 @@ def get_ingredients_list():
         return server_error(str(e)), 500
 
 @bp_refrigerator.post('/add/')
-def add_ingredients():
+def add_user_ingredients():
     try:
         endpoint, ingredients  = parse_info_from_json(request.get_json(silent=True), 
                                                       'endpoint', 'ingredients')
     except InvalidInputError as e:
+        return incorrect_data_response(str(e)), 400
+    
+    try:
+        validate_ingredients(ingredients)
+    except InvalidIngredientError as e:
         return incorrect_data_response(str(e)), 400
     
     try:
@@ -55,15 +61,20 @@ def add_ingredients():
     
     if not res:
         return server_error('서버 오류로 추가되지 않았습니다.'), 400
-    return success_response('추가되었습니다.')
+    return success_response('추가되었습니다.', data=res)
     
     
 @bp_refrigerator.post('/update/')
-def update_ingredients():
+def update_user_ingredients():
     try:
         endpoint, ingredients = parse_info_from_json(request.get_json(silent=True), 
                                                      'endpoint', 'ingredients')
     except InvalidInputError as e:
+        return incorrect_data_response(str(e)), 400
+    
+    try:
+        validate_ingredients(ingredients)
+    except InvalidIngredientError as e:
         return incorrect_data_response(str(e)), 400
         
     try:
@@ -75,12 +86,12 @@ def update_ingredients():
     
     if not res:
         return server_error('서버 오류로 수정되지 않았습니다.'), 400
-    return success_response('수정되었습니다.')
+    return success_response('수정되었습니다.', data=res)
     
-@bp_refrigerator.post('/delete/')
-def delete_ingredients():
+@bp_refrigerator.delete('/delete/')
+def delete_user_ingredients():
     try:
-        endpoint, ingredient_id = parse_info_from_json(request.get_json(silent=True), 
+        endpoint, ingredient_id = parse_info_from_json(request.args, 
                                                      'endpoint', 'id')
     except InvalidInputError as e:
         return incorrect_data_response(str(e)), 400
