@@ -1,3 +1,5 @@
+const API_DOMAIN = 'https://myrefrigerator.store';
+
 export const createElementWithClass = (
     tagName,
     classNameList,
@@ -116,3 +118,54 @@ export const getSubscriptionEndpoint = async () => {
     if (!pushSubs) return "";
     return pushSubs?.endpoint || "";
 };
+
+export const getCurrentId = () =>
+  window.location.pathname.replace(/\/$/, "").split("/").pop();
+
+export const setFavorite = async (favoriteId) => {
+    const endpointUrl = await getSubscriptionEndpoint();
+    if (!endpointUrl) {
+        promptAlertMsg('warn', '기기등록이 필요한 서비스입니다.\n홈 화면에서 기기등록을 진행해주세요.');
+        return false;
+    }
+    const response = await fetch(`${API_DOMAIN}/api/user/favorite/`, {
+        method: 'POST', 
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'recipe_id': favoriteId ?? getCurrentId(),
+            'endpoint': endpointUrl,
+        }),
+
+        
+    });
+    const respJson = await response.json();
+    if (respJson.resp_code === 'RET000') {
+        promptAlertMsg('info', '즐겨찾기에 추가되었습니다.');
+        return true;
+    }
+    promptAlertMsg('warn', respJson?.server_msg || '즐겨찾기 추가에 실패했습니다.');
+    return false
+}
+
+export const deleteFavorite = async (favoriteId) => {
+    const endpointUrl = await getSubscriptionEndpoint();
+    if (!endpointUrl) {
+        promptAlertMsg('warn', '기기등록이 필요한 서비스입니다.\n홈 화면에서 기기등록을 진행해주세요.');
+        return false;
+    }
+    const response = await fetch(`${API_DOMAIN}/api/user/favorite/?${new URLSearchParams({
+        'recipe_id': favoriteId ?? getCurrentId(),
+        'endpoint': endpointUrl,
+    }).toString()}`, {
+        method: 'DELETE',
+    });
+    const respJson = await response.json();
+    if (respJson.resp_code === 'RET000') {
+        promptAlertMsg('info', '즐겨찾기에서 삭제되었습니다.');
+        return true;
+    }
+    promptAlertMsg('warn', respJson?.server_msg || '즐겨찾기 삭제에 실패했습니다.');
+    return false
+}

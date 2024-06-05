@@ -119,7 +119,12 @@ def get_favorite_list():
     
     return success_response(
         '성공',
-        data=list(favorite_recipe)
+        data=[
+            {
+                **recipe,
+                'favorite': True    
+            } for recipe in favorite_recipe
+        ]
     )
         
     

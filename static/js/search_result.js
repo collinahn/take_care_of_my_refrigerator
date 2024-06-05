@@ -2,7 +2,9 @@ import {
     promptAlertMsg,
     createElementWithClass,
     removeFadeOut,
-    getSubscriptionEndpoint
+    getSubscriptionEndpoint,
+    setFavorite,
+    deleteFavorite
 } from './utils.js';
 
 const API_DOMAIN = 'https://myrefrigerator.store';
@@ -24,7 +26,7 @@ const getSearchResult = async (formData, forceCidx, sortFilter) => {
 
         renderSearchedSearchArea();
         recipeData.forEach((recipe) => {
-            const recipeItem = renderSearchResultList(recipe);
+            const recipeItem = createRecipeItem(recipe);
             resultArea.appendChild(recipeItem);
         });
     } else {
@@ -45,7 +47,7 @@ const getFavorites = async () => {
         }
 
         recipeData.forEach((recipe) => {
-            const recipeItem = renderSearchResultList(recipe);
+            const recipeItem = createRecipeItem(recipe);
             resultArea.appendChild(recipeItem);
         });
     } else {
@@ -81,7 +83,7 @@ const getRecentViews = async () => {
             return  viewedRecipes.indexOf(aId) - viewedRecipes.indexOf(bId);
         });
         recipeData.forEach((recipe) => {
-            const recipeItem = renderSearchResultList(recipe);
+            const recipeItem = createRecipeItem(recipe);
             resultArea.appendChild(recipeItem);
         });
     } else {
@@ -211,7 +213,7 @@ const renderSearchedSearchArea = () => {
                     
                 }, 100);
             }
-            container.style.height = "50px";
+            container.style.height = "35px";
         }
     }
 }
@@ -234,25 +236,43 @@ const getLastKeys = (ingredients) => {
 
     return lastKeys;
 }
-const renderSearchResultList = (recipeData) => {
-
-    const foodImage = createElementWithClass('div', ['food-image']);
+const createRecipeItem = (recipeData) => {
+    const isFavorite = recipeData?.favorite || false;
+    const foodImageHeader = createElementWithClass('div', ['food-image']);
+    const thumbContainer = createElementWithClass('div', ['thumb-container']);
+    const favoriteButton = createElementWithClass('button', ['star-button'], isFavorite ? '★' : '☆');
+    favoriteButton.onclick = async (e) => {
+        e.preventDefault();
+        const isFavorite = e.target.innerHTML === '★';
+        if (isFavorite) {
+            if (await deleteFavorite(recipeData?._id)) {
+                e.target.innerHTML = e.target.innerHTML === '☆' ? '★' : '☆';
+            }
+        } else {
+            if (await setFavorite(recipeData?._id)) {
+                e.target.innerHTML = e.target.innerHTML === '☆' ? '★' : '☆';
+            }
+        }
+    }
+    thumbContainer.appendChild(favoriteButton);
     const foodThumbnail = createElementWithClass('img');
     foodThumbnail.src = recipeData?.image;
     foodThumbnail.alt = recipeData?.title;
     foodThumbnail.loading = 'lazy';
     foodThumbnail.referrerpolicy = 'no-referrer';
-    foodImage.appendChild(foodThumbnail);
+    thumbContainer.appendChild(foodThumbnail);
+    foodImageHeader.appendChild(thumbContainer);
+    const cookTime = createElementWithClass('div', ['cook-time']);
+    if (recipeData?.cook_time) {
+        cookTime.textContent = `약 ${recipeData?.cook_time}분 소요`;
+        cookTime.style.textAlign = 'center';
+    }
+    foodImageHeader.appendChild(cookTime);
     
     const foodHeader = createElementWithClass('div', ['food-header']);
     const foodName = createElementWithClass('div', ['food-name'], null, recipeData?.title);
-    const cookTime = createElementWithClass('div', ['cook-time']);
-    if (recipeData?.cook_time) {
-        cookTime.textContent = `소요시간: 약 ${recipeData?.cook_time}분`;
-    }
     
     foodHeader.appendChild(foodName);
-    foodHeader.appendChild(cookTime);
     
     const ingredientList = createElementWithClass('div', ['ingredient-list']);
     const noIngredient = createElementWithClass('div', ['no-ingredient'], "없는 재료: 구현 예정");
@@ -272,7 +292,7 @@ const renderSearchResultList = (recipeData) => {
         recipeItem.id = recipeData._id;
         recipeItem.style.textDecoration = 'none';
     }
-    recipeItem.appendChild(foodImage);
+    recipeItem.appendChild(foodImageHeader);
     recipeItem.appendChild(foodDetails);
 
     return recipeItem;

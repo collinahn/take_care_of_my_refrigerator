@@ -1,6 +1,9 @@
 import {
   promptAlertMsg,
-  getSubscriptionEndpoint
+  getSubscriptionEndpoint,
+  getCurrentId,
+  setFavorite,
+  deleteFavorite,
 } from "./utils.js";
 
 const API_DOMAIN = 'https://myrefrigerator.store';
@@ -29,17 +32,12 @@ function removeRecipe(event) {
 }
 
 window.onload = function() {
-    document.querySelector('.tab-link[onclick="activateTab(event, \'search\')"]').click();
-    
     const closeButtons = document.querySelectorAll('.close-button');
     closeButtons.forEach(button => {
         button.addEventListener('click', removeRecipe);
     });
 };
 
-
-const getCurrentId = () =>
-  window.location.pathname.replace(/\/$/, "").split("/").pop();
 
 const getLastKeys = (ingredients) => {
     const lastKeys = [];
@@ -56,11 +54,10 @@ const getLastKeys = (ingredients) => {
         }
         });
     }
-
     return lastKeys;
 }
 
-const setUpFavoriteButton = async (isFavorite) => {
+export const setUpFavoriteButton = async (isFavorite) => {
     const favoriteButton = document.querySelector('.star-button');
     if (isFavorite) {
         favoriteButton.innerHTML = "★";
@@ -80,56 +77,6 @@ const setUpFavoriteButton = async (isFavorite) => {
         }
     }
 }
-
-
-const setFavorite = async () => {
-    const endpointUrl = await getSubscriptionEndpoint();
-    if (!endpointUrl) {
-        promptAlertMsg('warn', '기기등록이 필요한 서비스입니다.\n홈 화면에서 기기등록을 진행해주세요.');
-        return false;
-    }
-    const response = await fetch(`${API_DOMAIN}/api/user/favorite/`, {
-        method: 'POST', 
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            'recipe_id': getCurrentId(),
-            'endpoint': endpointUrl,
-        }),
-
-        
-    });
-    const respJson = await response.json();
-    if (respJson.resp_code === 'RET000') {
-        promptAlertMsg('info', '즐겨찾기에 추가되었습니다.');
-        return true;
-    }
-    promptAlertMsg('warn', respJson?.server_msg || '즐겨찾기 추가에 실패했습니다.');
-    return false
-}
-
-const deleteFavorite = async () => {
-    const endpointUrl = await getSubscriptionEndpoint();
-    if (!endpointUrl) {
-        promptAlertMsg('warn', '기기등록이 필요한 서비스입니다.\n홈 화면에서 기기등록을 진행해주세요.');
-        return false;
-    }
-    const response = await fetch(`${API_DOMAIN}/api/user/favorite/?${new URLSearchParams({
-        'recipe_id': getCurrentId(),
-        'endpoint': endpointUrl,
-    }).toString()}`, {
-        method: 'DELETE',
-    });
-    const respJson = await response.json();
-    if (respJson.resp_code === 'RET000') {
-        promptAlertMsg('info', '즐겨찾기에서 삭제되었습니다.');
-        return true;
-    }
-    promptAlertMsg('warn', respJson?.server_msg || '즐겨찾기 삭제에 실패했습니다.');
-    return false
-}
-
 
 const getSearchResult = async (formData) => {
     const resultArea = document.querySelector('.recipe-card')
