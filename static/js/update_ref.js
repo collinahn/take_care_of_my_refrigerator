@@ -1,6 +1,6 @@
 import { getSubscriptionEndpoint, createElementWithClass, promptAlertMsg, removeFadeOut } from './utils.js';
 
-const API_DOMAIN = 'http://127.0.0.1:5000'
+const API_DOMAIN = 'https://myrefrigerator.store'
 const GET_API_ENDPOINT = '/api/refrigerator/';
 const ADD_API_ENDPOINT = '/api/refrigerator/add/';
 const UPDATE_API_ENDPOINT = '/api/refrigerator/update/';
