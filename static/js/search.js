@@ -1,23 +1,18 @@
 function activateTab(evt, tabName) {
-    // Declare all variables
     var i, tablinks, contentBoxes;
 
-    // Get all elements with class="tab-link" and remove the class "active"
     tablinks = document.getElementsByClassName("tab-link");
     for (i = 0; i < tablinks.length; i++) {
         tablinks[i].classList.remove("active");
     }
 
-    // Hide all content boxes
     contentBoxes = document.getElementsByClassName("content-box");
     for (i = 0; i < contentBoxes.length; i++) {
         contentBoxes[i].style.display = "none";
     }
 
-    // Add an "active" class to the button that opened the tab
     evt.currentTarget.className += " active";
 
-    // Show the current tab
     if (tabName === "search") {
         document.getElementById("search-interaction").style.display = "block";
         if (document.querySelector('.recipe-list')?.children?.length !== 0) {
@@ -27,6 +22,7 @@ function activateTab(evt, tabName) {
         }
     } else {
         document.getElementById("search-interaction").style.display = "none";
-        document.getElementById(tabName).style.display = "block";
+        // For "favorites" and "recent", do not display content-box elements
+        document.getElementById(tabName).style.display = "none"; // Ensure content-box doesn't show
     }
 }
