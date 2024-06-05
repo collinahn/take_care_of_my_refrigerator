@@ -1,5 +1,6 @@
 function activateTab(evt, tabName) {
-    var i, tablinks, contentBoxes;
+    let i, tablinks, contentBoxes;
+    const recipeListArea = document.querySelector('.recipe-list');
 
     tablinks = document.getElementsByClassName("tab-link");
     for (i = 0; i < tablinks.length; i++) {
@@ -20,8 +21,10 @@ function activateTab(evt, tabName) {
         } else {
             document.getElementById("search").style.display = "block";
         }
+        recipeListArea.style.display = "flex";
     } else {
         document.getElementById("search-interaction").style.display = "none";
         document.getElementById(tabName).style.display = "block"; 
+        recipeListArea.style.display = "none";
     }
 }

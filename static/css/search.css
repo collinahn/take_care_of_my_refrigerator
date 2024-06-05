@@ -59,12 +59,13 @@ hr {
     align-items: center;
     justify-content: center;
     flex-grow: 1;
-    margin: 0 20px;
+    margin: 0 10px;
     margin-top: 20px;
     max-width: 700px;
-    padding: 20px;
+    width: calc(90vw - 20px); 
+    padding: 10px;
     border: 1px solid #ddd;
-    border-radius: 30px;
+    border-radius: 10px;
     min-height: 200px;
     position: relative;
     background-color: #FAFAF5;
@@ -89,6 +90,7 @@ hr {
     flex-direction: column;
     transition: all 0.5s ease-in-out;
     max-height: 200px;
+    padding: 10px;
 }
 
 .form-group {
@@ -166,7 +168,7 @@ p {
 }
 
 .content {
-    padding: 20px;
+    padding: 5px;
 }
 
 .recipe-list {
@@ -180,11 +182,32 @@ p {
     background-color: rgba(66, 107, 31, 0.2);
     border: 1px solid #ddd;
     padding: 10px;
-    margin: 0 40px;
-    margin-bottom: 20px;
+    position: relative;
+    border-radius: 5px;
+    max-width: 900px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.thumb-container {
     position: relative;
 }
 
+.star-button {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 30px;
+    color: #426B1F; 
+    font-weight: bold;
+    text-shadow: 2px 2px 1px rgba(255, 99, 71, 0.5);
+}
 .food-image img {
     width: 100px;
     height: 100px;
@@ -213,7 +236,6 @@ p {
 .cook-time {
     font-size: 14px;
     color: #666;
-    margin-right: 30px;
 }
 
 .ingredient-list {
