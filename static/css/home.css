@@ -44,6 +44,15 @@ header {
   margin: 0 auto;
 }
 
+.refrigerator-link {
+  display: inline-block;
+  position: relative;
+}
+
+.refrigerator-link:hover .refrigerator-image {
+  content: url('/main/refrigerator.jpg');
+}
+
 .main {
   padding: 20px;
   text-align: center;

@@ -164,6 +164,24 @@ const getSearchResult = async (formData) => {
     }
 }
 
+
+const updateViewedRecipes = () => {
+    const currentId = getCurrentId();
+    const storageKey = 'viewedRecipes';
+    let viewedRecipes = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+    viewedRecipes = viewedRecipes.filter(id => id !== currentId);
+
+    viewedRecipes.unshift(currentId);
+
+    if (viewedRecipes.length > 20) {
+        viewedRecipes = viewedRecipes.slice(0, 20);
+    }
+
+    localStorage.setItem(storageKey, JSON.stringify(viewedRecipes));
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     getSearchResult();
+    updateViewedRecipes();
 });
