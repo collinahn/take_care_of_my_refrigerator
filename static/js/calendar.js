@@ -1,7 +1,12 @@
-const items = {
-    '2024-05-11': ['두부 조림'],
-    '2024-05-23': ['계란']
-};
+import { getSubscriptionEndpoint, promptAlertMsg } from "./utils.js";
+
+// const items = {
+//     '2024-05-11': ['두부 조림'],
+//     '2024-05-23': ['계란']
+// };
+
+const API_DOMAIN = 'https://myrefrigerator.store';
+const GET_API_ENDPOINT = '/api/refrigerator/';
 
 const currentDate = new Date();
 let currentYear = currentDate.getFullYear();
@@ -19,7 +24,7 @@ function generateYearOptions() {
     }
 }
 
-function generateCalendar(year, month) {
+function generateCalendar(year, month, items) {
     const calendar = document.getElementById('calendar');
     calendar.innerHTML = '';
 
@@ -55,20 +60,20 @@ function generateCalendar(year, month) {
             itemCountLabel.textContent = `+ ${itemCount}`;
             itemCountLabel.onclick = function(event) {
                 event.stopPropagation();
-                showItems(dateStr);
+                showItems(dateStr, items);
             };
             dayCell.appendChild(itemCountLabel);
         }
 
         dayCell.onclick = function() {
-            showItems(dateStr);
+            showItems(dateStr, items);
         };
 
         calendar.appendChild(dayCell);
     }
 }
 
-function showItems(dateStr) {
+function showItems(dateStr, items) {
     const itemListTitle = document.getElementById('item-list-title');
     const itemListContent = document.getElementById('item-list-content');
 
@@ -79,7 +84,7 @@ function showItems(dateStr) {
     if (itemList) {
         itemList.forEach(item => {
             const itemElement = document.createElement('li');
-            itemElement.textContent = item;
+            itemElement.textContent = item.name;
             itemListContent.appendChild(itemElement);
         });
     } else {
@@ -95,7 +100,26 @@ function changeYearMonth() {
     generateCalendar(year, month);
 }
 
-window.onload = function() {
+const getItems = async () => {
+    const response = await fetch(`${API_DOMAIN}${GET_API_ENDPOINT}?endpoint=${await getSubscriptionEndpoint()}`);
+    const data = await response.json();
+    return data ?? [];
+};
+
+document.addEventListener("DOMContentLoaded", async ()=> {
     generateYearOptions();
-    generateCalendar(currentYear, currentMonth);
-}
+    const items = await getItems(); // 
+    const itemsByDate = items?.reduce?.((acc, item) => {
+        const date = item.expiryDate;
+        if (acc[date]) {
+            acc[date].push(item);
+        } else {
+            acc[date] = [item];
+        }
+        return acc;
+    }, {}) || [];
+    if (itemsByDate.length === 0) {
+        promptAlertMsg('warn', '식재료가 없습니다.');
+    }
+    generateCalendar(currentYear, currentMonth, itemsByDate);
+});
