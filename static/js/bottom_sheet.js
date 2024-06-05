@@ -68,6 +68,6 @@ const enableBottomSheet = (onclickFunction) => {
     document.addEventListener("touchend", dragStop);
     
     sheetOverlay.addEventListener("click", hideBottomSheet);
-    showModalBtn.addEventListener("click", ()=> showBottomSheet(onclickFunction));
+    showModalBtn?.addEventListener?.("click", ()=> showBottomSheet(onclickFunction));
 }
 

@@ -14,6 +14,7 @@ const createIngredientItem = (ingredient) => {
     newItem.setAttribute('data-quantity', ingredient.quantity);
     newItem.setAttribute('data-added', ingredient.added);
     newItem.setAttribute('data-id', ingredient.id);
+    newItem.setAttribute('data-name', ingredient.name);
 
     const categorySpan = createElementWithClass('span', ['category'], ingredient.userInputCategory ?? ingredient.category);
     const storageSpan = createElementWithClass('span', ['storage'], ingredient.storage);
@@ -144,14 +145,39 @@ const enableAddedDate = (date) => {
 
 }
 
+const resetForm = ()=> {
+    const form = document.getElementById('addItemForm');
+    const nameInput = form.querySelector('input[name="name"]');
+    if (form) {
+        form.reset();
+    }
+    if (nameInput) {
+        nameInput.focus();
+    }
+}
+
+const setAutoDateForm = () => {
+    // localtime
+    // set min date to today of local time
+    // set default date to today+7 of local time
+    const dateInput = document.getElementById('expiryDate');
+    if (dateInput) {
+        dateInput.min = new Date().toISOString().split('T')[0];
+        const defaultDate = new Date();
+        defaultDate.setDate(defaultDate.getDate() + 7);
+        dateInput.value = defaultDate.toISOString().split('T')[0];
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const addItemButton = document.querySelector('.add');
     if (addItemButton) {
         addItemButton.addEventListener('click', (e) => {
             changeModalTitle('식재료 추가');
             enableAddedDate();
-            const addItemForm = document.getElementById('addItemForm');
-            addItemForm.reset();
+            resetForm();
+            setAutoDateForm();
+
         });
     }
 

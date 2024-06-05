@@ -3,7 +3,7 @@ import {
   getSubscriptionEndpoint
 } from "./utils.js";
 
-const API_DOMAIN = 'http://myrefrigerator.store';
+const API_DOMAIN = 'https://myrefrigerator.store';
 
 function activateTab(evt, tabName) {
     var i, tablinks, contentBoxes;

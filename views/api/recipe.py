@@ -55,15 +55,17 @@ def bulk_recipe():
     if not recipe_ids:
         return incorrect_data_response('요청하신 레시피가 없습니다'), 400
     
-    recipes = recipe_ids.split('|')
+    recipes_id = recipe_ids.split('|')
     
     user_favorite_info = {}
     endpoint = request.args.get('endpoint')
     
+    log.info(f'bulk_recipe: {recipes_id}')
+    
     try:
         recipes = db_recipe.find(
             {
-                '_id': {'$in': [recipes]}
+                '_id': {'$in': recipes_id}
             },
             {
                 'original_url': 0,
@@ -74,6 +76,7 @@ def bulk_recipe():
                 {'sub.endpoint': endpoint},
                 {'favorite': 1}
             )
+        log.info(f'recipes: {recipes}')
         if not recipes:
             return incorrect_data_response('no recipe found'), 400
     except PyMongoError as pe:

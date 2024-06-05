@@ -22,7 +22,6 @@ function activateTab(evt, tabName) {
         }
     } else {
         document.getElementById("search-interaction").style.display = "none";
-        // For "favorites" and "recent", do not display content-box elements
-        document.getElementById(tabName).style.display = "none"; // Ensure content-box doesn't show
+        document.getElementById(tabName).style.display = "block"; 
     }
 }

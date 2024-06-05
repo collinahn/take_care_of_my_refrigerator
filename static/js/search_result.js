@@ -5,7 +5,8 @@ import {
     getSubscriptionEndpoint
 } from './utils.js';
 
-const API_DOMAIN = 'http://myrefrigerator.store';
+const API_DOMAIN = 'https://myrefrigerator.store';
+// const API_DOMAIN = 'http://127.0.0.1:5000';
 
 const getSearchResult = async (formData, forceCidx, sortFilter) => {
     const resultArea = document.querySelector('.recipe-list');
@@ -37,13 +38,48 @@ const getFavorites = async () => {
     const response = await fetch(`${API_DOMAIN}/api/user/favorite/?endpoint=${await getSubscriptionEndpoint()}`);
     const respJson = await response.json();
     if (respJson.resp_code === 'RET000') {
-        promptAlertMsg('info', respJson?.server_msg);
         const recipeData = respJson?.data;
         if (!recipeData || recipeData.length === 0) {
             resultArea.textContent = '즐겨찾기한 레시피가 없습니다.';
             return;
         }
 
+        recipeData.forEach((recipe) => {
+            const recipeItem = renderSearchResultList(recipe);
+            resultArea.appendChild(recipeItem);
+        });
+    } else {
+        promptAlertMsg('warn', respJson?.server_msg || '검색 결과를 가져오는데 실패했습니다.');
+    }
+}
+
+const getRecentViews = async () => {
+    const storageKey = 'viewedRecipes';
+    const resultArea = document.querySelector('#recent');
+    const viewedRecipes = JSON.parse(localStorage.getItem(storageKey) || "[]").slice(0, 20);
+    const ids = viewedRecipes.join('|');
+    console.log(ids);
+
+    if (viewedRecipes.length === 0) {
+        resultArea.textContent = '최근 본 레시피가 없습니다.';
+        return;
+    }
+
+    const response = await fetch(`${API_DOMAIN}/api/recipe/bulk/?endpoint=${await getSubscriptionEndpoint()}&ids=${ids}`);
+    const respJson = await response.json();
+    if (respJson.resp_code === 'RET000') {
+        const recipeData = respJson?.data;
+        if (!recipeData || recipeData.length === 0) {
+            resultArea.textContent = '최근 본 레시피가 없습니다.';
+            return;
+        }
+        
+        // sort by recent views
+        recipeData.sort((a, b) => {
+            const aId = a._id;
+            const bId = b._id;
+            return  viewedRecipes.indexOf(aId) - viewedRecipes.indexOf(bId);
+        });
         recipeData.forEach((recipe) => {
             const recipeItem = renderSearchResultList(recipe);
             resultArea.appendChild(recipeItem);
@@ -122,6 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     await getFavorites();
+    await getRecentViews();
 
 
 });
