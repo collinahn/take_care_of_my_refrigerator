@@ -52,7 +52,7 @@ function generateCalendar(year, month, items) {
 
         dayCell.appendChild(dateLabel);
 
-        if (items[dateStr]) {
+        if (items?.[dateStr]) {
             dayCell.classList.add('has-item');
             const itemCount = items[dateStr].length;
             const itemCountLabel = document.createElement('div');
@@ -106,6 +106,13 @@ const getItems = async () => {
     return data ?? [];
 };
 
+const setupCalendar = () => {
+    const yearSelect = document.getElementById('year-select');
+    const monthSelect = document.getElementById('month-select');
+    yearSelect.onchange = changeYearMonth;
+    monthSelect.onchange = changeYearMonth;
+}
+
 document.addEventListener("DOMContentLoaded", async ()=> {
     generateYearOptions();
     const items = await getItems(); // 
@@ -121,5 +128,6 @@ document.addEventListener("DOMContentLoaded", async ()=> {
     if (itemsByDate.length === 0) {
         promptAlertMsg('warn', '식재료가 없습니다.');
     }
+    setupCalendar();
     generateCalendar(currentYear, currentMonth, itemsByDate);
 });

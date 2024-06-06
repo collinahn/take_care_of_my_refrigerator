@@ -169,3 +169,4 @@ static/.DS_Store
 .prettierignore
 .vscode/
 model/gsheet*
+model/saved_model.pkl
