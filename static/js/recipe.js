@@ -1,9 +1,9 @@
 import {
-  promptAlertMsg,
-  getSubscriptionEndpoint,
-  getCurrentId,
-  setFavorite,
-  deleteFavorite,
+promptAlertMsg,
+getSubscriptionEndpoint,
+getCurrentId,
+setFavorite,
+deleteFavorite,
 } from "./utils.js";
 
 const API_DOMAIN = 'https://myrefrigerator.store';
@@ -38,6 +38,14 @@ window.onload = function() {
     });
 };
 
+function closePage() {
+    window.history.back();
+}
+
+window.onload = function() {
+    const closeButton = document.querySelector('.list-button');
+    closeButton.addEventListener('click', closePage);
+};
 
 const getLastKeys = (ingredients) => {
     const lastKeys = [];
