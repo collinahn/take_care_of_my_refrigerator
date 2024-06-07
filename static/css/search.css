@@ -76,6 +76,16 @@ hr {
     margin-right: auto;
 }
 
+#favorites {
+    color:#426B1F;
+    text-align: center;
+}
+
+#recent {
+    color:#426B1F;
+    text-align: center;
+}
+
 .content-box.active {
     display: flex;
 }
