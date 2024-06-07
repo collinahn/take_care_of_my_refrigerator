@@ -1,7 +1,6 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  overflow-y: auto;
   padding-bottom: 100px;
 }
 
@@ -81,16 +80,15 @@ img {
 footer {
   position: fixed;
   bottom: 0;
-  left: 0;
   width: 100%;
   text-align: center;
-  padding: 10px;
+  padding: 5px;
+  background-color: white;
 }
 
 footer p {
-  color: #426b1f;
+  color: #426B1F;
   font-size: 12px;
-  padding: 10px;
   text-align: center;
 }
 
