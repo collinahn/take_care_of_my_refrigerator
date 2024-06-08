@@ -7,8 +7,8 @@ import {
     deleteFavorite
 } from './utils.js';
 
-const API_DOMAIN = 'https://myrefrigerator.store';
-// const API_DOMAIN = 'http://127.0.0.1:5000';
+// const API_DOMAIN = 'https://myrefrigerator.store';
+const API_DOMAIN = 'http://127.0.0.1:5000';
 
 const getSearchResult = async (formData, forceCidx, sortFilter) => {
     const resultArea = document.querySelector('.recipe-list');
@@ -231,10 +231,12 @@ const createRecipeItem = (recipeData, isFavoriteView) => {
     foodHeader.appendChild(foodName);
     
     const ingredientList = createElementWithClass('div', ['ingredient-list']);
-    const noIngredient = createElementWithClass('div', ['no-ingredient'], "없는 재료: 구현 예정");
+    const noIngredient = createElementWithClass('div', ['no-ingredient'], `없는 재료: ${recipeData?.ingred404?.join(', ')}`);
     const availableIngredient = createElementWithClass('div', ['available-ingredient'], getLastKeys(recipeData?.ingredients).join(', '));
     
-    ingredientList.appendChild(noIngredient);
+    if (recipeData?.ingred404?.length > 0) {
+        ingredientList.appendChild(noIngredient);
+    }
     ingredientList.appendChild(availableIngredient);
     
     const foodDetails = createElementWithClass('div', ['food-details']);
@@ -380,6 +382,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 100);
 
     const searchForm = document.querySelector('.search-form');
+    // add hidden input for token
+    const tokenInput = document.createElement('input');
+    tokenInput.type = 'hidden';
+    tokenInput.name = 'endpoint';
+    tokenInput.value = await getSubscriptionEndpoint();
+    searchForm.appendChild(tokenInput);
+
     searchForm.onsubmit = async (e) => {
         e.preventDefault();
 

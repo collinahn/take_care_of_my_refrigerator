@@ -37,8 +37,6 @@ def search_recipe():
         sort_method = (
             'cook_time', 1
         )
-        
-        
     
     try:
         _searched_recipe = list(db_recipe.find(
@@ -64,13 +62,38 @@ def search_recipe():
         if not _searched_recipe:
             return incorrect_data_response('검색 결과가 없습니다'), 404
         
+        _user_data = db_users.find_one(
+            {'sub.endpoint': endpoint},
+            {
+                'refrigerator': 1,
+                'favorite': 1,
+            }
+        ) or {}
+        
+        _ingredients = set([ i.get('name') for i in _user_data.get('refrigerator', [])])
+        _favorite = _user_data.get('favorite', [])
+        
+        _searched_recipe = [
+            {
+                **recipe,
+                'favorite': recipe.get('_id') in _favorite,
+                'ingred404': [
+                    ingred
+                    for ingred in recipe.get('ingred', [])
+                    if ingred not in _ingredients
+                ]
+            }
+            for recipe in _searched_recipe
+        ]
+        
     except PyMongoError as pe:
         log.error(pe)
         return server_error('잠시 후 다시 이용해주세요'), 500
-    
+        
     return success_response(
         data={
             'display_list': _searched_recipe,
+            'refrigerator': list(_ingredients),
             'nidx': cidx+ 20,
         },
     )
