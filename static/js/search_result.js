@@ -7,8 +7,8 @@ import {
     deleteFavorite
 } from './utils.js';
 
-// const API_DOMAIN = 'https://myrefrigerator.store';
-const API_DOMAIN = 'http://127.0.0.1:5000';
+const API_DOMAIN = 'https://myrefrigerator.store';
+// const API_DOMAIN = 'http://127.0.0.1:5000';
 
 const getSearchResult = async (formData, forceCidx, sortFilter) => {
     const resultArea = document.querySelector('.recipe-list');
