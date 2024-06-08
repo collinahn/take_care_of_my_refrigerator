@@ -47,7 +47,7 @@ const getFavorites = async () => {
         }
 
         recipeData.forEach((recipe) => {
-            const recipeItem = createRecipeItem(recipe);
+            const recipeItem = createRecipeItem(recipe, true);
             resultArea.appendChild(recipeItem);
         });
     } else {
@@ -60,7 +60,6 @@ const getRecentViews = async () => {
     const resultArea = document.querySelector('#recent');
     const viewedRecipes = JSON.parse(localStorage.getItem(storageKey) || "[]").slice(0, 20);
     const ids = viewedRecipes.join('|');
-    console.log(ids);
 
     if (viewedRecipes.length === 0) {
         resultArea.textContent = '최근 본 레시피가 없습니다.';
@@ -83,7 +82,7 @@ const getRecentViews = async () => {
             return  viewedRecipes.indexOf(aId) - viewedRecipes.indexOf(bId);
         });
         recipeData.forEach((recipe) => {
-            const recipeItem = createRecipeItem(recipe);
+            const recipeItem = createRecentRecipe(recipe);
             resultArea.appendChild(recipeItem);
         });
     } else {
@@ -117,53 +116,7 @@ const addSeeMoreButtonRecursive = (formData) => {
 
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    setTimeout(() => {
-        document.querySelector('.tab-link').click();
-    }, 100);
 
-    const searchForm = document.querySelector('.search-form');
-    searchForm.onsubmit = async (e) => {
-        e.preventDefault();
-
-        const formData = new FormData(e.target, e.submitter);
-        for (let pair of formData.entries()) {
-            console.log(pair, formData)
-        }
-        if ([...formData.values()].every(v => v === '')) {
-            promptAlertMsg('warn', '검색어를 입력해주세요.');
-            return;
-        }
-        const resultArea = document.querySelector('.recipe-list');
-        Array.from(resultArea?.children)?.forEach?.(child => {
-            removeFadeOut(child);
-        })
-        await getSearchResult(formData, 0);
-        if (document.querySelector('.recipe-list')?.children?.length !== 0) {
-            addSeeMoreButtonRecursive(formData);
-        }
-    }
-
-    const searchSortFilter = document.getElementById('filter');
-    searchSortFilter.onchange = async (e) => {
-        const searchForm = document.querySelector('.search-form');
-        const formData = new FormData(searchForm);
-        const sortFilter = e.target.value;
-        const resultArea = document.querySelector('.recipe-list');
-        Array.from(resultArea?.children)?.forEach?.(child => {
-            removeFadeOut(child);
-        })
-        await getSearchResult(formData, 0, sortFilter);
-        if (document.querySelector('.recipe-list')?.children?.length !== 0) {
-            addSeeMoreButtonRecursive(formData);
-        }
-    }
-
-    await getFavorites();
-    await getRecentViews();
-
-
-});
 
 const renderDefaultSearchArea = () => {
     const container = document.querySelector('#search-interaction');
@@ -236,7 +189,7 @@ const getLastKeys = (ingredients) => {
 
     return lastKeys;
 }
-const createRecipeItem = (recipeData) => {
+const createRecipeItem = (recipeData, isFavoriteView) => {
     const isFavorite = recipeData?.favorite || false;
     const foodImageHeader = createElementWithClass('div', ['food-image']);
     const thumbContainer = createElementWithClass('div', ['thumb-container']);
@@ -247,6 +200,9 @@ const createRecipeItem = (recipeData) => {
         if (isFavorite) {
             if (await deleteFavorite(recipeData?._id)) {
                 e.target.innerHTML = e.target.innerHTML === '☆' ? '★' : '☆';
+                if (isFavoriteView) {
+                    removeFadeOut(e.target.closest('.recipe-item'));
+                }
             }
         } else {
             if (await setFavorite(recipeData?._id)) {
@@ -297,3 +253,168 @@ const createRecipeItem = (recipeData) => {
 
     return recipeItem;
 }
+const createRecentRecipe = (recipeData) => {
+    const isFavorite = recipeData?.favorite || false;
+    const foodImageHeader = createElementWithClass('div', ['food-image']);
+    const thumbContainer = createElementWithClass('div', ['thumb-container']);
+    const favoriteButton = createElementWithClass('button', ['star-button'], isFavorite ? '★' : '☆');
+    favoriteButton.onclick = async (e) => {
+        e.preventDefault();
+        const isFavorite = e.target.innerHTML === '★';
+        if (isFavorite) {
+            if (await deleteFavorite(recipeData?._id)) {
+                e.target.innerHTML = e.target.innerHTML === '☆' ? '★' : '☆';
+            }
+        } else {
+            if (await setFavorite(recipeData?._id)) {
+                e.target.innerHTML = e.target.innerHTML === '☆' ? '★' : '☆';
+            }
+        }
+    }
+    thumbContainer.appendChild(favoriteButton);
+    const foodThumbnail = createElementWithClass('img');
+    foodThumbnail.src = recipeData?.image;
+    foodThumbnail.alt = recipeData?.title;
+    foodThumbnail.loading = 'lazy';
+    foodThumbnail.referrerpolicy = 'no-referrer';
+    thumbContainer.appendChild(foodThumbnail);
+    foodImageHeader.appendChild(thumbContainer);
+    const cookTime = createElementWithClass('div', ['cook-time']);
+    if (recipeData?.cook_time) {
+        cookTime.textContent = `약 ${recipeData?.cook_time}분 소요`;
+        cookTime.style.textAlign = 'center';
+    }
+    foodImageHeader.appendChild(cookTime);
+    
+    const foodHeader = createElementWithClass('div', ['food-header']);
+    const foodName = createElementWithClass('div', ['food-name'], null, recipeData?.title);
+    
+    foodHeader.appendChild(foodName);
+    
+    const ingredientList = createElementWithClass('div', ['ingredient-list']);
+    // const noIngredient = createElementWithClass('div', ['no-ingredient'], "없는 재료: 구현 예정");
+    const availableIngredient = createElementWithClass('div', ['available-ingredient'], getLastKeys(recipeData?.ingredients).join(', '));
+    
+    // ingredientList.appendChild(noIngredient);
+    ingredientList.appendChild(availableIngredient);
+    
+    const foodDetails = createElementWithClass('div', ['food-details']);
+    foodDetails.appendChild(foodHeader);
+    foodDetails.appendChild(ingredientList);
+
+
+    const recipeItem = createElementWithClass('a', ['recipe-item']);
+    if (recipeData?._id) {
+        recipeItem.href = `/recipe/${recipeData?._id}`;
+        recipeItem.id = recipeData._id;
+        recipeItem.style.textDecoration = 'none';
+    }
+    recipeItem.appendChild(foodImageHeader);
+    recipeItem.appendChild(foodDetails);
+
+    const closeBtn = createElementWithClass('button', ['delete-button'], '삭제');
+    closeBtn.onclick = (e) => {
+        e.preventDefault();
+        const recipeItem = e.target.closest('.recipe-item');
+        removeFadeOut(recipeItem);
+        window.localStorage.setItem('viewedRecipes', JSON.stringify(JSON.parse(window.localStorage.getItem('viewedRecipes')).filter(id => id !== recipeData._id)));
+    }
+    recipeItem.appendChild(closeBtn);
+
+    return recipeItem;
+}
+
+
+async function activateTab(evt, tabName) {
+    let i, tablinks, contentBoxes;
+    const recipeListArea = document.querySelector('.recipe-list');
+
+    tablinks = document.getElementsByClassName("tab-link");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove("active");
+    }
+
+    contentBoxes = document.getElementsByClassName("content-box");
+    for (i = 0; i < contentBoxes.length; i++) {
+        contentBoxes[i].style.display = "none";
+    }
+
+    evt.currentTarget.className += " active";
+
+    if (tabName === "search") {
+        document.getElementById("search-interaction").style.display = "block";
+        if (document.querySelector('.recipe-list')?.children?.length !== 0) {
+            document.getElementById("search").style.display = "none";
+        } else {
+            document.getElementById("search").style.display = "block";
+        }
+        recipeListArea.style.display = "flex";
+    } else {
+        document.getElementById("search-interaction").style.display = "none";
+        document.getElementById(tabName).style.display = "block"; 
+        recipeListArea.style.display = "none";
+    }
+
+    if (tabName === 'favorites') {
+        await getFavorites();
+    }
+    if (tabName === 'recent') {
+        await getRecentViews();
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('searchTab').onclick = (e) => {
+        activateTab(e, 'search');
+    }
+    document.getElementById('favoriteTab').onclick = (e) => {
+        activateTab(e, 'favorites');
+    }
+    document.getElementById('recentTab').onclick = (e) => {
+        activateTab(e, 'recent');
+    }
+
+    setTimeout(() => {
+        document.querySelector('.tab-link').click();
+    }, 100);
+
+    const searchForm = document.querySelector('.search-form');
+    searchForm.onsubmit = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.target, e.submitter);
+        for (let pair of formData.entries()) {
+            console.log(pair, formData)
+        }
+        if ([...formData.values()].every(v => v === '')) {
+            promptAlertMsg('warn', '검색어를 입력해주세요.');
+            return;
+        }
+        const resultArea = document.querySelector('.recipe-list');
+        Array.from(resultArea?.children)?.forEach?.(child => {
+            removeFadeOut(child);
+        })
+        await getSearchResult(formData, 0);
+        if (document.querySelector('.recipe-list')?.children?.length !== 0) {
+            addSeeMoreButtonRecursive(formData);
+        }
+    }
+
+    const searchSortFilter = document.getElementById('filter');
+    searchSortFilter.onchange = async (e) => {
+        const searchForm = document.querySelector('.search-form');
+        const formData = new FormData(searchForm);
+        const sortFilter = e.target.value;
+        const resultArea = document.querySelector('.recipe-list');
+        Array.from(resultArea?.children)?.forEach?.(child => {
+            removeFadeOut(child);
+        })
+        await getSearchResult(formData, 0, sortFilter);
+        if (document.querySelector('.recipe-list')?.children?.length !== 0) {
+            addSeeMoreButtonRecursive(formData);
+        }
+    }
+
+
+});

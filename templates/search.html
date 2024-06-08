@@ -179,13 +179,13 @@
         </header>
         <main>
             <div class="tab-menu">
-                <button class="tab-link" onclick="activateTab(event, 'search')">검색</button>
-                <button class="tab-link" onclick="activateTab(event, 'favorites')">즐겨찾기</button>
-                <button class="tab-link" onclick="activateTab(event, 'recent')">최근 본 레시피</button>
+                <button class="tab-link" id="searchTab">검색</button>
+                <button class="tab-link" id="favoriteTab">즐겨찾기</button>
+                <button class="tab-link" id="recentTab">최근 본 레시피</button>
             </div>
             <hr>
-            <div id="search-interaction" class="content-box">
-                <div id="search">
+            <div id="search-interaction">
+                <div id="search" class="content-box">
                     <form class="search-form">
                         <div class="form-group">
                             <label for="recipeName">요리명</label>
@@ -219,7 +219,7 @@
             <div id="recent" class="content-box" style="display:none;">
                 <!-- Recent content -->
             </div>
-    
+
             <section class="content">
                 <div class="recipe-list">
                     <!-- Other recipes -->
@@ -228,7 +228,6 @@
         </main>
         <script type="module" src="/js/utils.js"></script>
         <script type="module" src="/js/search_result.js"></script>
-        <script src="/js/search.js"></script>
         <footer>
             <p>Copyright &copy; HUFS SW&AI Capstone Design A4용지. All Rights Reserved.</p>
         </footer>
