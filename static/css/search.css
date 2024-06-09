@@ -214,6 +214,8 @@ p {
     background: none;
     border: none;
     cursor: pointer;
+    padding: 0;
+    margin: 0;
     font-size: 30px;
     color: #426B1F; 
     font-weight: bold;

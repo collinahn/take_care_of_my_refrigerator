@@ -106,8 +106,9 @@ hr {
 }
 
 .recipe-card img {
-    margin-left: 20px;
-    width: 30%;
+    margin-left: 10px;
+    min-width: max(30%, 120px);
+    max-width: min(50%, 350px);
     height: auto;
     border-radius: 10px;
 }

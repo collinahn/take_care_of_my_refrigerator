@@ -170,3 +170,4 @@ static/.DS_Store
 .vscode/
 model/gsheet*
 model/saved_model.pkl
+model/xlsx*

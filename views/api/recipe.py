@@ -50,7 +50,8 @@ def recipe_data(recipe_id):
             ingred
             for ingred in recipe_info.get('ingred', [])
             if ingred not in _ingredients
-        ]
+        ],
+        'refrigerator': list(_ingredients)
     })
 
 
