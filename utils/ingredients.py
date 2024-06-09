@@ -162,3 +162,30 @@ def delete_ingredients(endpoint: str, ingredients_id: str) -> bool:
     except Exception as e:
         log.error(e)
         raise InvalidIngredientError('올바르지 않은 재료형식입니다.')
+    
+def delete_many_ingredients_by_name(endpoint: str, ingredients_ids:list) -> bool:
+    try:
+        update_res = db_users.update_one(
+            {'sub.endpoint': endpoint}, 
+            {
+                '$pull': {
+                    'refrigerator': {
+                        'name': {
+                            '$in': ingredients_ids
+                        }
+                    }
+                }
+            }
+        )
+        if update_res.matched_count == 0:
+            raise UserNotFoundError('존재하지 않는 사용자이거나 재료가 없습니다.')
+        return True
+    except PyMongoError as e:
+        log.error(e)
+        return False
+    except UserNotFoundError as e:
+        log.error(e)
+        raise UserNotFoundError('존재하지 않는 사용자입니다.')
+    except Exception as e:
+        log.error(e)
+        raise InvalidIngredientError('올바르지 않은 재료형식입니다.')

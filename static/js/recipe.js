@@ -4,7 +4,8 @@ getCurrentId,
 setFavorite,
 deleteFavorite,
 carouselItemsToBeAppended,
-createElementWithClassV2
+createElementWithClassV2,
+promptAlertMsg
 } from "./utils.js";
 
 const API_DOMAIN = 'https://myrefrigerator.store';
@@ -104,9 +105,10 @@ const getSearchResult = async (formData) => {
         const recipeData = respJson.data
         titleH3.innerText = recipeData.title;
         recipeThumbnail.src = recipeData.image;
+        const recipeIngredients = recipeData?.ingred || []
 
         ingredientList.replaceChildren();
-        recipeData.ingred.forEach((ingredient, idx, arr) => {
+        recipeIngredients?.forEach((ingredient, idx, arr) => {
             if (recipeData?.ingred404?.includes(ingredient)) {
                 return;
             }
@@ -150,6 +152,71 @@ const getSearchResult = async (formData) => {
             recipeStepLi.innerText = `${step}`;
             recipeStep.appendChild(recipeStepLi);
         });
+        setTimeout(() => {
+            enableBottomSheet(()=> {
+                const bottomSheetBody = document.getElementById('modalBody')
+                bottomSheetBody.replaceChildren();
+                const titleH3 = createElementWithClassV2('h3', [], {
+                    innerText: '이번 요리에서 남은 재료를 선택 해제해주세요'
+                })
+                bottomSheetBody.appendChild(titleH3);
+                const formElem = createElementWithClassV2('form', [], {
+                    onsubmit: async (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(e.target);
+                        const checkedIngredients = formData.getAll('ingredient');
+                        if (checkedIngredients.length === 0) {
+                            promptAlertMsg('warn', '선택된 재료가 없습니다.');
+                            return;
+                        }
+                        if (!window.confirm(`선택된 ${checkedIngredients.length}개의 재료가 냉장고에서 삭제됩니다.`)){
+                            return;
+                        }
+                        try {
+                            const response = await fetch(`${API_DOMAIN}/api/recipe/${getCurrentId()}/?endpoint=${await getSubscriptionEndpoint()}&id=${checkedIngredients}`, {
+                                method: 'DELETE',
+                            });
+                            const respJson = await response.json();
+                            if (respJson.resp_code === 'RET000') {
+                                await getSearchResult();
+                                promptAlertMsg('info', respJson.server_msg);
+                                hideBottomSheet();
+                            } else {
+                                promptAlertMsg('warn', respJson.server_msg);
+                            }
+                        } catch (e) {
+                            console.error(e);
+                            promptAlertMsg('warn', '서버와의 통신 중 문제가 발생했습니다.');
+                        }
+                    }
+                });
+                const checkboxContainer = createElementWithClassV2('div', ['checkbox-container']);
+                recipeIngredients.forEach((ingredient) => {
+                    const ingredientInput = createElementWithClassV2('input', [], {
+                        type: 'checkbox',
+                        name: 'ingredient',
+                        checked: true,
+                        value: ingredient,
+                        id: `ingredient-${ingredient}`
+                    });
+                    const ingredientLabel = createElementWithClassV2('label', ['ingredient'], {
+                        for: `ingredient-${ingredient}`,
+                        innerText: ingredient
+                    });
+                    checkboxContainer.appendChild(ingredientInput);
+                    checkboxContainer.appendChild(ingredientLabel);
+                });
+                formElem.appendChild(checkboxContainer);
+                const submitButton = createElementWithClassV2('button', ['submit'], {
+                    type: 'submit',
+                    innerText: '선택된 재료를 냉장고에서 삭제합니다.'
+                });
+                formElem.appendChild(submitButton);
+                bottomSheetBody.appendChild(formElem);
+                })
+        }, 300);
+
+
     } else {
         titleH3.innerText = respJson.server_msg;
     }
@@ -207,5 +274,5 @@ const getRecommendList = async () => {
 document.addEventListener('DOMContentLoaded', function() {
     getSearchResult();
     updateViewedRecipes();
-    getRecommendList()
+    getRecommendList();
 });

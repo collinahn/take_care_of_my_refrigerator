@@ -201,16 +201,15 @@
                     </ul>
                 </div>
                 <ol id="recipe-step">
-                    <!-- <li>소금을 넣은 끓는 물에 파스타를 알 덴테로 삶아서 건진다.</li>
-                    <li>팬에 올리브 오일을 두르고 중불에서 마늘을 슬라이스해 볶다가 건진다.</li>
-                    <li>팬에 삶은 파스타, 소금, 후추를 넣고 재빨리 섞는다.</li>
-                    <li>접시에 담고, 원한다면 파슬리를 뿌려 마무리한다.</li> -->
                 </ol>
                 <!-- <div class="navigation-buttons">
                     <button>이전</button>
                     <button>레시피로 이동</button>
                     <button>다음</button>
                 </div> -->
+                <div id="useRecipe" class="use-recipe">
+                    <button id="useRecipeBtn" class="show-modal">이 레시피를 사용했어요</button>
+                </div>
             </section>
             <section class="banner">
                 <div class="banner-content">
@@ -236,17 +235,12 @@
                 <div class="header">
                     <div class="drag-icon"><span></span></div>
                 </div>
-                <div class="body" id="notification_modal_body">
-                    <h3>사용자 데이터를 불러오는 중 ...</h3>
+                <div class="body" id="modalBody">
+                    <h3>불러오는 중</h3>
                 </div>
             </div>
         </div>
-
         <script src="/js/bottom_sheet.js"></script>
-        <script id="enable-bsmodal">
-            enableBottomSheet(() => {
-            })
-        </script>
 
         <div id="myref_alert"></div>
 

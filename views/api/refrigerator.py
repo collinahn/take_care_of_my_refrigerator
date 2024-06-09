@@ -15,6 +15,7 @@ from utils.ingredients import (
     add_ingredients, 
     update_ingredients, 
     delete_ingredients,
+    delete_many_ingredients_by_name,
     validate_ingredients
 )
 
@@ -99,6 +100,27 @@ def delete_user_ingredients():
     
     try:
         res = delete_ingredients(endpoint, ingredient_id)
+    except UserNotFoundError as e:
+        return incorrect_data_response(str(e)), 400
+    except InvalidIngredientError as e:
+        return incorrect_data_response(str(e)), 400
+    
+    if not res:
+        return server_error('서버 오류로 삭제되지 않았습니다.'), 400
+    return success_response('삭제되었습니다.')
+
+@bp_refrigerator.delete('/bulk/delete/')
+def bulk_delete_user_ingredients_by_name():
+    try:
+        endpoint, ingredient_ids = parse_info_from_json(request.args, 
+                                                     'endpoint', 'id')
+    except InvalidInputError as e:
+        return incorrect_data_response(str(e)), 400
+    
+    ingredient_ids = ingredient_ids.split(',')
+    
+    try:
+        res = delete_many_ingredients_by_name(endpoint, ingredient_ids)
     except UserNotFoundError as e:
         return incorrect_data_response(str(e)), 400
     except InvalidIngredientError as e:

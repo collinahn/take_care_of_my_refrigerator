@@ -163,7 +163,59 @@ footer p {
     text-align: center;
 }
 
+/* 재료삭제 모달창 */
+.use-recipe .show-modal {
+    padding: 10px;
+    font-size: medium;
+    font-weight: bold;
+    color: black;
+    border: #426B1F 2px solid;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+.use-recipe .show-modal:hover {
+    color: white;
+}
+.bottom-sheet form {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 30px;
+    padding-top: 5px;
+}
+.bottom-sheet .checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap: 10px;
+    padding: 10px;
+}
+.bottom-sheet .checkbox-container input[type="checkbox"] {
+    display: none;
+}
+.bottom-sheet .checkbox-container input[type="checkbox"] + label {
+    display: inline-block;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: rgba(66, 107, 31, 0.5);
+    color: white;
+    transition: background-color 0.3s;
+}
+.bottom-sheet .checkbox-container input[type="checkbox"]:checked + label {
+    background-color: #426B1F;
+    font-weight: bold;
+}
+.bottom-sheet button[type="submit"] {
+    padding: 10px;
+    border: none;
+    color: black;
+    cursor: pointer;
+    margin-top: 20px;
+}
 
+
+
+/* 추천 배너 */
 .banner {
   display: flex;
   position: relative;
@@ -175,6 +227,9 @@ footer p {
   border-radius: 5px;
   overflow-x: hidden;
   margin: 0 auto;
+}
+.banner-content {
+    padding-left: 10px;
 }
 .banner .banner-title {
   display: flex;
@@ -251,7 +306,6 @@ footer p {
 }
 .banner .carousel .carousel-item .floating {
   position: absolute;
-  z-index: 10;
   margin-block: 0;
   margin-inline: 0;
 }
