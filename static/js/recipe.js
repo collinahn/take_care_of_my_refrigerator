@@ -79,6 +79,7 @@ const getSearchResult = async (formData) => {
     const ingredientList = resultArea.querySelector('#ingredient-list');
     const recipeStep = resultArea.querySelector('#recipe-step');
     const searchTrigger = document.querySelector('#formKeywordInput');
+    searchTrigger.replaceChildren();
     searchTrigger.appendChild(
         createElementWithClassV2('input', [], {
             type:'radio',
@@ -96,6 +97,14 @@ const getSearchResult = async (formData) => {
                 for: `keyword-`,
                 innerText: '전체',
             })
+    )
+    searchTrigger.appendChild(
+        createElementWithClassV2('input', [], {
+            type: 'submit',
+            style: {
+                display: 'none'
+            }
+        })
     )
 
     const response = await fetch(`${API_DOMAIN}/api/recipe/${getCurrentId()}/?endpoint=${await getSubscriptionEndpoint()}`);
@@ -152,70 +161,85 @@ const getSearchResult = async (formData) => {
             recipeStepLi.innerText = `${step}`;
             recipeStep.appendChild(recipeStepLi);
         });
-        setTimeout(() => {
-            enableBottomSheet(()=> {
-                const bottomSheetBody = document.getElementById('modalBody')
-                bottomSheetBody.replaceChildren();
-                const titleH3 = createElementWithClassV2('h3', [], {
-                    innerText: '이번 요리에서 남은 재료를 선택 해제해주세요'
-                })
-                bottomSheetBody.appendChild(titleH3);
-                const formElem = createElementWithClassV2('form', [], {
-                    onsubmit: async (e) => {
-                        e.preventDefault();
-                        const formData = new FormData(e.target);
-                        const checkedIngredients = formData.getAll('ingredient');
-                        if (checkedIngredients.length === 0) {
-                            promptAlertMsg('warn', '선택된 재료가 없습니다.');
-                            return;
-                        }
-                        if (!window.confirm(`선택된 ${checkedIngredients.length}개의 재료가 냉장고에서 삭제됩니다.`)){
-                            return;
-                        }
-                        try {
-                            const response = await fetch(`${API_DOMAIN}/api/recipe/${getCurrentId()}/?endpoint=${await getSubscriptionEndpoint()}&id=${checkedIngredients}`, {
-                                method: 'DELETE',
-                            });
-                            const respJson = await response.json();
-                            if (respJson.resp_code === 'RET000') {
-                                await getSearchResult();
-                                promptAlertMsg('info', respJson.server_msg);
-                                hideBottomSheet();
-                            } else {
-                                promptAlertMsg('warn', respJson.server_msg);
-                            }
-                        } catch (e) {
-                            console.error(e);
-                            promptAlertMsg('warn', '서버와의 통신 중 문제가 발생했습니다.');
-                        }
+        enableBottomSheet(()=> {
+            const bottomSheetBody = document.getElementById('modalBody')
+            bottomSheetBody.replaceChildren();
+            const titleH3 = createElementWithClassV2('h3', [], {
+                innerText: '이번 요리에서 남은 재료를 선택 해제해주세요'
+            })
+            bottomSheetBody.appendChild(titleH3);
+            const formElem = createElementWithClassV2('form', [], {
+                onsubmit: async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    const checkedIngredients = formData.getAll('ingredient');
+                    if (checkedIngredients.length === 0) {
+                        promptAlertMsg('warn', '선택된 재료가 없습니다.');
+                        return;
                     }
+                    if (!window.confirm(`선택된 ${checkedIngredients.length}개의 재료가 냉장고에서 삭제됩니다.`)){
+                        return;
+                    }
+                    try {
+                        const response = await fetch(`${API_DOMAIN}/api/refrigerator/bulk/delete/?endpoint=${await getSubscriptionEndpoint()}&id=${checkedIngredients}`, {
+                            method: 'DELETE',
+                        });
+                        const respJson = await response.json();
+                        if (respJson.resp_code === 'RET000') {
+                            await getSearchResult();
+                            promptAlertMsg('info', respJson.server_msg);
+                            hideBottomSheet();
+                        } else {
+                            promptAlertMsg('warn', respJson.server_msg);
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        promptAlertMsg('warn', '서버와의 통신 중 문제가 발생했습니다.');
+                    }
+                }
+            });
+            const checkboxContainer = createElementWithClassV2('div', ['checkbox-container']);
+            recipeIngredients.forEach((ingredient) => {
+                const ingredientInput = createElementWithClassV2('input', [], {
+                    type: 'checkbox',
+                    name: 'ingredient',
+                    checked: true,
+                    value: ingredient,
+                    id: `ingredient-${ingredient}`
                 });
-                const checkboxContainer = createElementWithClassV2('div', ['checkbox-container']);
-                recipeIngredients.forEach((ingredient) => {
-                    const ingredientInput = createElementWithClassV2('input', [], {
-                        type: 'checkbox',
-                        name: 'ingredient',
-                        checked: true,
-                        value: ingredient,
-                        id: `ingredient-${ingredient}`
-                    });
-                    const ingredientLabel = createElementWithClassV2('label', ['ingredient'], {
-                        for: `ingredient-${ingredient}`,
-                        innerText: ingredient
-                    });
-                    checkboxContainer.appendChild(ingredientInput);
-                    checkboxContainer.appendChild(ingredientLabel);
+                const ingredientLabel = createElementWithClassV2('label', ['ingredient'], {
+                    for: `ingredient-${ingredient}`,
+                    innerText: ingredient
                 });
-                formElem.appendChild(checkboxContainer);
-                const submitButton = createElementWithClassV2('button', ['submit'], {
-                    type: 'submit',
-                    innerText: '선택된 재료를 냉장고에서 삭제합니다.'
-                });
-                formElem.appendChild(submitButton);
-                bottomSheetBody.appendChild(formElem);
-                })
-        }, 300);
-
+                checkboxContainer.appendChild(ingredientInput);
+                checkboxContainer.appendChild(ingredientLabel);
+            });
+            formElem.appendChild(checkboxContainer);
+            const submitButton = createElementWithClassV2('button', ['submit'], {
+                type: 'submit',
+                innerText: '선택된 재료를 냉장고에서 삭제합니다.'
+            });
+            formElem.appendChild(submitButton);
+            bottomSheetBody.appendChild(formElem);
+            })
+        searchTrigger.appendChild(
+            createElementWithClassV2('input', [], {
+                type: 'search',
+                placeholder: '검색어를 입력하세요',
+                id: 'keyboardInput',
+                oninput: async (e) => {
+                    if (e.target.value === '') {
+                        await updateBanner()
+                        searchTrigger.querySelectorAll('input[type="radio"]').forEach(radio => {
+                            radio.checked = false;
+                            if (radio.id === 'keyword-') {
+                                radio.checked = true;
+                            }
+                        })
+                    }
+                }
+            })
+        )
 
     } else {
         titleH3.innerText = respJson.server_msg;
@@ -251,13 +275,6 @@ const getRecommendList = async () => {
         await updateBanner()
 
         const formKeywordInput = document.querySelector('#formKeywordInput');
-        formKeywordInput.appendChild(
-            createElementWithClassV2('input', [], {
-                type: 'search',
-                placeholder: '검색어를 입력하세요',
-                id: 'keyboardInput'
-            })
-        )
         formKeywordInput.onsubmit = async (e) => {
             e.preventDefault();
             formKeywordInput.querySelector('input[type="search"]').blur();
