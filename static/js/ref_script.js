@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             items.sort((a, b) => {
                 const aCategory = a.dataset.category;
                 const bCategory = b.dataset.category;
-                return -aCategory.localeCompare(bCategory);
+                return aCategory.localeCompare(bCategory);
             });
             itemsArea.replaceChildren(...items);
         }
