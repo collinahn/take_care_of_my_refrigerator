@@ -348,7 +348,7 @@ const createCarouselItemsForRecommend = (itemData) => {
         innerText: itemData?.title?.slice(0, 24),
     });
 
-    const priceDisplay = createElementWithClassV2("div", ["title-font"], {
+    const priceDisplay = createElementWithClassV2("div", ["title-font", "final-price"], {
         innerText: formatNumberToWonVerbose(itemData?.price),
     });
     carouselItem.appendChild(itemImg);
@@ -365,7 +365,7 @@ const createCarouselItemsForRecommend = (itemData) => {
 };
 
 const fetchPriceDownBanner = async (keyword) => {
-  const cidx = document.getElementById('carouselRecommend').childElementCount || 0;
+  const cidx = document.querySelectorAll(".carousel-item").length;
   if (cidx === -1) {
     return {};
   }

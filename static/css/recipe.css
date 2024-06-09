@@ -227,6 +227,7 @@ footer p {
 }
 
 .banner .carousel .carousel-item .item-title {
+    font-size: small;
   display: inline-block;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -342,6 +343,10 @@ body[data-darkmode="on"] .banner .carousel .carousel-item .text-tag {
 .banner .carousel .fade-out {
   opacity: 0;
   transform: translateX(20px);
+}
+.banner .final-price {
+    font-size: medium;
+    font-weight: bold;
 }
 #load-all {
   color: inherit;

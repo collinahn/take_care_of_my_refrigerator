@@ -232,7 +232,7 @@ const createRecipeItem = (recipeData, isFavoriteView) => {
     
     const ingredientList = createElementWithClass('div', ['ingredient-list']);
     const noIngredient = createElementWithClass('div', ['no-ingredient'], `없는 재료: ${recipeData?.ingred404?.join(', ')}`);
-    const availableIngredient = createElementWithClass('div', ['available-ingredient'], getLastKeys(recipeData?.ingredients).join(', '));
+    const availableIngredient = createElementWithClass('div', ['available-ingredient'], recipeData?.ingred?.join(', '));
     
     if (recipeData?.ingred404?.length > 0) {
         ingredientList.appendChild(noIngredient);

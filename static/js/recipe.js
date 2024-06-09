@@ -10,23 +10,6 @@ createElementWithClassV2
 const API_DOMAIN = 'https://myrefrigerator.store';
 // const API_DOMAIN = 'http://127.0.0.1:5000';
 
-function activateTab(evt, tabName) {
-    var i, tablinks, contentBoxes;
-
-    tablinks = document.getElementsByClassName("tab-link");
-    for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-
-    contentBoxes = document.getElementsByClassName("tab-content");
-    for (i = 0; i < contentBoxes.length; i++) {
-        contentBoxes[i].style.display = "none";
-    }
-
-    evt.currentTarget.className += " active";
-
-    document.getElementById(tabName).style.display = "block";
-}
 
 function removeRecipe(event) {
     const recipeItem = event.currentTarget.closest(".recipe-item");
@@ -123,7 +106,7 @@ const getSearchResult = async (formData) => {
         recipeThumbnail.src = recipeData.image;
 
         ingredientList.replaceChildren();
-        getLastKeys(recipeData.ingredients).forEach((ingredient, idx, arr) => {
+        recipeData.ingred.forEach((ingredient, idx, arr) => {
             if (recipeData?.ingred404?.includes(ingredient)) {
                 return;
             }
@@ -149,7 +132,8 @@ const getSearchResult = async (formData) => {
                     id: `keyword-${ingredient}`,
                     value: ingredient,
                     onchange: async (e) => {
-                    await updateBanner(ingredient)
+                        const ingredientTextIndex = ingredient?.length > 3 ? ingredient.split('').join(' ') : "";
+                        await updateBanner(`${ingredient} ${ingredientTextIndex} ${ingredient.slice(0, 2)} ${ingredient.slice(2)}`)
                     }
                 })
             )
