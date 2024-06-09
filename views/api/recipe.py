@@ -14,7 +14,7 @@ bp_recipe = Blueprint('recipe', __name__, url_prefix='/api/recipe')
 log = get_logger()
 
 @bp_recipe.get('/<recipe_id>/')
-def recipe(recipe_id):
+def recipe_data(recipe_id):
     if not recipe_id:
         return incorrect_data_response('recipe_id is required')
     
@@ -22,7 +22,7 @@ def recipe(recipe_id):
     endpoint = request.args.get('endpoint')
     
     try:
-        recipe_info = db_recipe.find_one(
+        recipe_info: dict = db_recipe.find_one(
             {'_id': recipe_id},
             {
                 'original_url': 0,
@@ -31,7 +31,10 @@ def recipe(recipe_id):
         if endpoint:
             user_favorite_info = db_users.find_one(
                 {'sub.endpoint': endpoint},
-                {'favorite': 1}
+                {
+                    'favorite': 1, 
+                    'refrigerator': 1,
+                }
             ) or {}
         if not recipe_info:
             return incorrect_data_response('no recipe found'), 400
@@ -39,10 +42,15 @@ def recipe(recipe_id):
         log.error(pe)
         return server_error()
     
-    
+    _ingredients = set([ i.get('name') for i in user_favorite_info.get('refrigerator', [])])
     return success_response('성공', data={
         **recipe_info,
-        'favorite': recipe_id in user_favorite_info.get('favorite', [])
+        'favorite': recipe_id in user_favorite_info.get('favorite', []),
+        'ingred404': [
+            ingred
+            for ingred in recipe_info.get('ingred', [])
+            if ingred not in _ingredients
+        ]
     })
 
 
