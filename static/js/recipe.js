@@ -144,7 +144,7 @@ const getSearchResult = async (formData) => {
                     value: ingredient,
                     onchange: async (e) => {
                         const ingredientTextIndex = ingredient?.length > 3 ? ingredient.split('').join(' ') : "";
-                        await updateBanner(`${ingredient} ${ingredientTextIndex} ${ingredient.slice(0, 2)} ${ingredient.slice(2)}`)
+                        await updateBanner(`${ingredient} ${ingredientTextIndex} ${ingredient.slice(0, 2)} ${ingredient.slice(2)} ${ingredient.slice(0, 3)} ${ingredient.slice(3)}`)
                     }
                 })
             )
@@ -228,7 +228,7 @@ const getSearchResult = async (formData) => {
                 placeholder: '검색어를 입력하세요',
                 id: 'keyboardInput',
                 oninput: async (e) => {
-                    if (e.target.value === '') {
+                    if (e.data === undefined) {
                         await updateBanner()
                         searchTrigger.querySelectorAll('input[type="radio"]').forEach(radio => {
                             radio.checked = false;
