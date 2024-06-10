@@ -39,9 +39,24 @@ def search_recipe():
         )
     
     try:
+        _user_data = db_users.find_one(
+            {'sub.endpoint': endpoint},
+            {
+                'refrigerator': 1,
+                'favorite': 1,
+                'profile': 1,
+            }
+        ) or {} if endpoint else {}
+        
+        _ingredients = set([ i.get('name') for i in _user_data.get('refrigerator', [])])
+        _favorite = _user_data.get('favorite', [])
+        _hate = _user_data.get('profile', {}).get('hate', [])
+        
+        
         _searched_recipe = list(db_recipe.find(
             {
                 '$text': {'$search': f'{title} {keyword}'},
+                'ingred': {'$nin': _hate}
             },
             {
                 'title': 1,
@@ -62,17 +77,7 @@ def search_recipe():
         if not _searched_recipe:
             return incorrect_data_response('검색 결과가 없습니다'), 404
         
-        _user_data = db_users.find_one(
-            {'sub.endpoint': endpoint},
-            {
-                'refrigerator': 1,
-                'favorite': 1,
-            }
-        ) or {}
-        
-        _ingredients = set([ i.get('name') for i in _user_data.get('refrigerator', [])])
-        _favorite = _user_data.get('favorite', [])
-        
+
         _searched_recipe = [
             {
                 **recipe,
@@ -94,6 +99,7 @@ def search_recipe():
         data={
             'display_list': _searched_recipe,
             'refrigerator': list(_ingredients),
+            'hate': _hate,
             'nidx': cidx+ 20,
         },
     )
