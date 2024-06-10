@@ -497,7 +497,7 @@ export const carouselItemsToBeAppended = async (keyword) => {
       itemsArray.push(carouselItemContainer);
     }
 
-    if (idx === arr.length - 1 && bannerData?.next_page_key !== -1) {
+    if (idx === arr.length - 1 && (bannerData?.display_list.length === 100)) {
       let intersectionObs = new IntersectionObserver(
         async (entries, observer) => {
           if (entries?.[0] && !entries[0].isIntersecting) {

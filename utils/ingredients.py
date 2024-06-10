@@ -4,7 +4,8 @@ from pymongo import ReturnDocument
 from datetime import datetime
 
 from utils.logger import get_logger
-from db.mongo import db_users
+from db.mongo import db_users, db_recipe
+from db.redis import redis_client
 
 log = get_logger()
 
@@ -189,3 +190,29 @@ def delete_many_ingredients_by_name(endpoint: str, ingredients_ids:list) -> bool
     except Exception as e:
         log.error(e)
         raise InvalidIngredientError('올바르지 않은 재료형식입니다.')
+    
+
+
+def get_autocomplete_data(keyword: str, limit: int = 30) -> list:
+    '''
+    keyword: 인코딩되지 않은 문자열
+    limit: 최대 반환할 데이터 개수
+    '''
+    start =f'[{keyword}'.encode('utf-8')
+    end = start + b'\xff'
+    try:
+        return redis_client.zrangebylex('__autocomplete__ingred', start, end, start=0, num=limit)
+    except Exception as e:
+        log.error(e)
+        return []
+
+    
+def set_autocomplete_index():
+    ingred: list[str] = db_recipe.distinct('ingred')
+    redis_client.zadd('__autocomplete__ingred', {
+        ing.encode('utf-8'): 0 for ing in ingred
+    })
+    
+if __name__ == '__main__':
+
+    set_autocomplete_index()

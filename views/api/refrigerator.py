@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from pymongo.errors import PyMongoError
 from bson import ObjectId
 
-from db.mongo import db_users
+from db.redis import redis_client
 from utils.response import incorrect_data_response, server_error, success_response
 from utils.logger import get_logger
 from utils.ingredients import (
@@ -16,7 +16,8 @@ from utils.ingredients import (
     update_ingredients, 
     delete_ingredients,
     delete_many_ingredients_by_name,
-    validate_ingredients
+    validate_ingredients,
+    get_autocomplete_data
 )
 
 bp_refrigerator = Blueprint('refrigerator', __name__, url_prefix='/api/refrigerator')
@@ -129,3 +130,16 @@ def bulk_delete_user_ingredients_by_name():
     if not res:
         return server_error('서버 오류로 삭제되지 않았습니다.'), 400
     return success_response('삭제되었습니다.')
+
+@bp_refrigerator.get('/autocomplete/recipe/name/')
+def autocomplete_recipe_name():
+    try:
+        query, = parse_info_from_json(request.args, 'q')
+        query: str
+    except InvalidInputError as e:
+        return incorrect_data_response(str(e)), 400
+    
+    data = get_autocomplete_data(query)
+    
+    return success_response('성공', data=data)
+    
