@@ -107,7 +107,15 @@ const onSubmitForm = async (e, type) => {
 }
 
 const loadItems = async () => {
-    const response = await fetch(`${API_DOMAIN}${GET_API_ENDPOINT}?endpoint=${await getSubscriptionEndpoint()}`);
+    const userEndpoint = await getSubscriptionEndpoint();
+
+    if (!userEndpoint) {
+        promptAlertMsg('warn', '홈 화면에서 알림 아이콘을 눌러 기기등록을 먼저 진행해주세요.');
+        document.querySelector('.items').replaceChildren(createElementWithClass('li', ['item'], null, '기기 등록 전엔 냉장고 서비스 이용이 불가합니다.'));
+        return
+    }
+
+    const response = await fetch(`${API_DOMAIN}${GET_API_ENDPOINT}?endpoint=${userEndpoint}`);
     const data = await response.json();
     const userRefrigeratorItemsArray = data ?? [];
 
