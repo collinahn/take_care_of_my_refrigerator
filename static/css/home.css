@@ -25,6 +25,7 @@ header {
 
 .menu {
   display: flex;
+  margin-top: 15px;
 }
 
 .menu a {
