@@ -13,12 +13,14 @@ from utils.ingredients import (
     parse_info_from_json, 
     get_ingredients,
     add_ingredients, 
+    bulk_add_ingredients,
     update_ingredients, 
     delete_ingredients,
     delete_many_ingredients_by_name,
     validate_ingredients,
     get_autocomplete_data
 )
+from utils.ocr.ocr_by_gptapi import receipt_ocr_gptapi_binary
 
 bp_refrigerator = Blueprint('refrigerator', __name__, url_prefix='/api/refrigerator')
 log = get_logger()
@@ -131,6 +133,34 @@ def bulk_delete_user_ingredients_by_name():
         return server_error('서버 오류로 삭제되지 않았습니다.'), 400
     return success_response('삭제되었습니다.')
 
+@bp_refrigerator.post('/upload/')
+def upload_file():
+    try:
+        endpoint,  = parse_info_from_json(request.form, 
+                                            'endpoint')
+    except InvalidInputError as e:
+        return incorrect_data_response(str(e)), 400
+    
+    if 'file' not in request.files:
+        return incorrect_data_response('파일이 존재하지 않습니다.'), 400
+    file = request.files['file']
+    if file.filename == '':
+        return incorrect_data_response('선택된 파일이 없습니다.'), 400
+    if file:
+        file_content = file.read()
+        gpt_result: list[dict] = receipt_ocr_gptapi_binary(file_content)
+        log.info(f'gpt_result: {gpt_result}')
+        
+        try:
+            bulk_add_ingredients(endpoint, gpt_result)
+        except UserNotFoundError as e:
+            return incorrect_data_response(str(e)), 400
+        except InvalidIngredientError as e:
+            return incorrect_data_response(str(e)), 400
+        
+
+        return success_response('성공')
+
 @bp_refrigerator.get('/autocomplete/recipe/name/')
 def autocomplete_recipe_name():
     try:
@@ -142,4 +172,5 @@ def autocomplete_recipe_name():
     data = get_autocomplete_data(query)
     
     return success_response('성공', data=data)
+
     

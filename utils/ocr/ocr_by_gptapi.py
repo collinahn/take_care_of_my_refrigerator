@@ -7,10 +7,12 @@ Original file is located at
     https://colab.research.google.com/drive/1MA40C0TKiMpneeFomajWukvCnAY7NgRw
 """
 
-from openai import OpenAI
+# from openai import OpenAI
 import base64
 import requests
 import re
+from datetime import datetime, timedelta
+from __classified.vapid import OPEN_API_KEY
 
 def receipt_ocr_gptapi(image_path):
     # 이미지 인코딩 함수
@@ -21,12 +23,9 @@ def receipt_ocr_gptapi(image_path):
     # 이미지 인코딩
     base64_image = encode_image(image_path)
 
-    # API KEY 지정
-    api_key = '키입력(유출우려있어서 따로 입력부탁)'
-
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}"
+        "Authorization": f"Bearer {OPEN_API_KEY}"
     }
     # 모델 선택 및 내용 전달
     payload = {
@@ -58,6 +57,62 @@ def receipt_ocr_gptapi(image_path):
 
     return purchase_item
 
-# 함수 호출
-image_path = './utils/ocr/ocr_ex3.jpg'
-print(receipt_ocr_gptapi(image_path))
+
+def receipt_ocr_gptapi_binary(image_binary: bytes):
+
+    # 이미지 인코딩
+    base64_image = base64.b64encode(image_binary).decode('utf-8')
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {OPEN_API_KEY}"
+    }
+    # 모델 선택 및 내용 전달
+    payload = {
+        "model": "gpt-4o",
+        "messages": [
+            {"role": 'system', 'content': "너는 영수증 이미지에서 식재료와 관련정보를 추출하는 역할을 할거야"},
+            {"role": "user", "content": [
+                {"type": "text",
+                 "text": "업로드된 사진은 영수증 이미지야. 영수증에서 다음을 추출해줘. \n 1. 재료명 \n 2. 보관방법 : 냉장/냉동/실온으로 분류 \n3. 카테고리 : 과일류/육류/해산물/채소류/유제품/간식류로 분류 \n 재료별로 추출한 후, 다음과 같은 리스트 안 딕셔너리 형태로 저장해줘. 변수명은 purchse_item으로 해주고, 다음과 같은 형태로 만들어줘. [{name : '다진마늘, save : 냉장, category : 채소}, {~ }. {~ },]"
+                 },
+                {"type": "image_url",
+                 "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}
+                 }
+            ]
+            },
+        ],
+        "max_tokens": 300
+    }
+
+    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+
+    # 선택된 메시지의 content만 따로 추출하여 저장
+    gpt_answer = response.json()['choices'][0]['message']['content']
+
+    # gpt 답변에서 딕셔너리 리스트만 추출하여 purchase_item으로 저장
+    pattern = r"['\"]name['\"]:\s*['\"](.*?)['\"],\s*['\"]save['\"]:\s*['\"](.*?)['\"],\s*['\"]category['\"]:\s*['\"](.*?)['\"]"
+    purchase_item = re.findall(pattern, gpt_answer)
+    
+    purchase_item = [
+        {
+            'name': item[0], 
+            'storage': item[1], 
+            'category': item[2],
+            'userInputCategory': '',
+            # 오늘 + 7 일 형식 '2024-12-31'
+            'expiryDate': (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d'),
+            'quantity': 1,
+            'quantityUnit': 'pcs',
+            'fileUpload': True
+        } 
+        for item in purchase_item
+    ]
+
+    return purchase_item
+
+
+if __name__ == '__main__':
+    # 함수 호출
+    image_path = './utils/ocr/ocr_ex3.jpg'
+    print(receipt_ocr_gptapi(image_path))

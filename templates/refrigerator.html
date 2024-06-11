@@ -196,7 +196,15 @@
                         <option value="category">카테고리가나다순</option>
                         <option value="name">이름가나다순</option>
                     </select>
-                    <button class="show-modal add">+</button>
+                    <div style="display: flex; align-items: center;">
+                        <div style="display: flex; align-items: center;">
+                            <div id="processingText"></div>
+                            <input style="display: none;" type="file" accept="image/*" id="fileInput">
+                            <img style="width: 30px; height: 30px; padding-right: 10px; cursor: pointer;"
+                                src="/assets/image.png" alt="영수증 사진 입력" id="picInput">
+                        </div>
+                        <button class="show-modal add">+</button>
+                    </div>
                 </div>
                 <ul class="items">
                     <!-- <li class="item">

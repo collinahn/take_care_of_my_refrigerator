@@ -1,13 +1,17 @@
 import { getSubscriptionEndpoint, createElementWithClass, promptAlertMsg, removeFadeOut } from './utils.js';
 
 const API_DOMAIN = 'https://myrefrigerator.store'
+// const API_DOMAIN = 'http://127.0.0.1:4000'
 const GET_API_ENDPOINT = '/api/refrigerator/';
 const ADD_API_ENDPOINT = '/api/refrigerator/add/';
 const UPDATE_API_ENDPOINT = '/api/refrigerator/update/';
 const DELETE_API_ENDPOINT = '/api/refrigerator/delete/';
+const UPLOAD_API_ENDPOINT = '/api/refrigerator/upload/';
 
 const createIngredientItem = (ingredient) => {
     const newItem = createElementWithClass('li', ['item']);
+    newItem.style.position = 'relative';
+
     newItem.setAttribute('data-category', ingredient.category);
     newItem.setAttribute('data-storage', ingredient.storage);
     newItem.setAttribute('data-expiryDate', ingredient.expiryDate);
@@ -55,6 +59,17 @@ const createIngredientItem = (ingredient) => {
 
     }
     newItem.replaceChildren(storageSpan, categorySpan, nameSpan, expirySpan, editButton, deleteButton);
+    if (ingredient.fileUpload && (new Date().getTime() - new Date(ingredient.added).getTime() < 60* 1000)) {
+        const redDot = createElementWithClass('span', ['red-dot']);
+        redDot.style.position = 'absolute';
+        redDot.style.top = '1px';
+        redDot.style.left = '1px';
+        redDot.style.width = '5px';
+        redDot.style.height = '5px';
+        redDot.style.borderRadius = '50%';
+        redDot.style.backgroundColor = 'tomato';
+        newItem.appendChild(redDot);
+    }
     return newItem;
 }
 
@@ -124,6 +139,16 @@ const loadItems = async () => {
         itemsArea.replaceChildren(createElementWithClass('li', ['item'], null, '추가된 식재료가 없습니다.'));
     }
     else {
+        //sort if fileUpload is true and added date is within 1 minute
+        userRefrigeratorItemsArray.sort((a, b) => {
+            if (a.fileUpload && (new Date().getTime() - new Date(a.added).getTime() < 60* 1000)) {
+                return -1;
+            }
+            if (b.fileUpload && (new Date().getTime() - new Date(b.added).getTime() < 60* 1000)) {
+                return 1;
+            }
+            return 0;
+        });
         itemsArea.replaceChildren(...userRefrigeratorItemsArray.map((ingredient) => createIngredientItem(ingredient)));
     }
 }
@@ -213,6 +238,59 @@ const setAutocompleteForm = () => {
     }, 400)
 }
 
+const setFileUpload = () => {
+    const picInput = document.getElementById('picInput');
+    const fileInput = document.getElementById('fileInput');
+
+    picInput.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', async (event) => {
+        let intervalCounter = 0;
+        let loadingInterval = null;
+        const file = event.target.files[0];
+        
+        if (file) {
+            document.getElementById('processingText').innerText = '파일 업로드 중';
+            loadingInterval = setInterval(() => {
+                if (intervalCounter > 20) {
+                    document.getElementById('processingText').innerText = '데이터를 불러오는 중.'+ '.'.repeat(intervalCounter % 4);
+                } else if (intervalCounter > 5) {
+                    document.getElementById('processingText').innerText = '사진 분석 중.'+ '.'.repeat(intervalCounter % 4);
+                } else {
+                    document.getElementById('processingText').innerText = '파일 업로드 중.'+ '.'.repeat(intervalCounter % 4);
+                }
+                intervalCounter += 1;
+            }, 500);
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('endpoint', await getSubscriptionEndpoint());
+
+            try {
+                const response = await fetch(`${API_DOMAIN}${UPLOAD_API_ENDPOINT}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const respJson = await response.json();
+                if (respJson.resp_code === 'RET000') {
+                    promptAlertMsg('info', respJson.server_msg);
+                    await loadItems();
+                    return
+                }
+                promptAlertMsg('warn', respJson.server_msg);
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            } finally {
+                clearInterval(loadingInterval);
+                document.getElementById('processingText').innerText = '';
+            }
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const addItemButton = document.querySelector('.add');
 if (addItemButton) {
@@ -260,5 +338,6 @@ if (addItemButton) {
 
     loadItems();
     setAutocompleteForm();
+    setFileUpload()
 
 });

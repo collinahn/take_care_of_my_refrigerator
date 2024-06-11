@@ -100,6 +100,42 @@ def add_ingredients(endpoint: str, ingredients: dict) -> dict:
         log.error(e)
         raise InvalidIngredientError('올바르지 않은 재료형식입니다.')
     
+def bulk_add_ingredients(endpoint: str, ingredients: list[dict]) -> dict:
+    try:
+        update_res = db_users.find_one_and_update(
+            {'sub.endpoint': endpoint}, 
+            {
+                '$push': {
+                    'refrigerator': {
+                        '$each': [{
+                            **ingred,
+                            'id': str(ObjectId()),
+                            'added': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                            }
+                            for ingred in ingredients
+                        ],
+                    }
+                }
+            },
+            {
+                'refrigerator': 1
+            },
+            return_document=ReturnDocument.AFTER
+        )
+        if not update_res:
+            raise UserNotFoundError('존재하지 않는 사용자입니다.')
+        
+        return update_res        
+    except PyMongoError as e:
+        log.error(e)
+        return None
+    except UserNotFoundError as e:
+        log.error(e)
+        raise UserNotFoundError('존재하지 않는 사용자입니다.')
+    except Exception as e:
+        log.error(e)
+        raise InvalidIngredientError('올바르지 않은 재료형식입니다.')
+    
 def update_ingredients(endpoint: str, ingredients: dict)  -> dict:
     ingredients_id = ingredients.get('id')
     if not ingredients_id:
