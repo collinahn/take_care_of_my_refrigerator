@@ -179,16 +179,19 @@ const setAutoDateForm = () => {
     }
 }
 
+let __delayTimer = 0
+const delay = (fn, ms) => {
+  return function(...args) {
+    clearTimeout(__delayTimer)
+    __delayTimer = setTimeout(fn.bind(this, ...args), ms || 0)
+  }
+}
+
+
 const setAutocompleteForm = () => {
     const ingredNameInput = document.getElementById('ingredNameInput');
     const keywordDataList = document.getElementById('ingredName');
-    ingredNameInput.onkeyup = async (e) => {
-        if (!e?.target?.value) {
-            return
-        }
-        if (e?.isComposing) {
-            return; // 한글 조합 중인 경우 추가 요청 안보냄 
-        }
+    ingredNameInput.oninput = delay(async (e) => {
         try {
             const response = await fetch(`${API_DOMAIN}/api/refrigerator/autocomplete/recipe/name/?q=${e?.target?.value}`);
             const data = await response.json();
@@ -207,7 +210,7 @@ const setAutocompleteForm = () => {
         } catch (error) {
             console.error(error);
         }
-    }
+    }, 400)
 }
 
 document.addEventListener('DOMContentLoaded', () => {
