@@ -10,6 +10,10 @@ Original file is located at
 # !pip install konlpy
 # !pip install fasttext
 
+'''
+pip install openpyxl pandas numpy konlpy gensim tqdm joblib scipy==1.12
+'''
+
 import pandas as pd
 import numpy as np
 from ast import literal_eval
