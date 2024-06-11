@@ -151,6 +151,9 @@ def upload_file():
         gpt_result: list[dict] = receipt_ocr_gptapi_binary(file_content)
         log.info(f'gpt_result: {gpt_result}')
         
+        if not gpt_result:
+            return incorrect_data_response('사진으로부터 식재료 정보를 찾을 수 없습니다.\n선명한 사진으로 다시 시도해보세요'), 400
+        
         try:
             bulk_add_ingredients(endpoint, gpt_result)
         except UserNotFoundError as e:
