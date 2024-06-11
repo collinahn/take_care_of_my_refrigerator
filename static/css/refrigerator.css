@@ -84,7 +84,9 @@ hr {
     color: #426B1F;
     font-size: 35px;
     cursor: pointer;
-    padding: 0.25rem 0.55rem;
+    text-align: center;
+    height: 30px;
+    width: 30px;
     font-size: 20px;
 }
 .add:hover {
@@ -241,7 +243,6 @@ hr {
 .add-item-sheet .body .form-row input,
 .add-item-sheet .body .form-row select {
     flex: 1;
-    padding: 8px;
     border: none;
     background-color: rgba(66, 107, 31, 0.1);
 }
@@ -272,9 +273,16 @@ hr {
     width: 100%;
     background-color: rgba(66, 107, 31, 0.8);
     color: white;
+    padding: 5px;
+    height: 30px;
     border: none;
-    padding: 10px;
     cursor: pointer;
+}
+
+.add-item-sheet .body input,
+.add-item-sheet .body select {
+    height: 30px;
+    padding: 0;
 }
 
 footer {
