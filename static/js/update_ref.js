@@ -160,7 +160,9 @@ const resetForm = ()=> {
         form.reset();
     }
     if (nameInput) {
-        nameInput.focus();
+        setTimeout(() => {
+            nameInput.focus();
+        }, 200)
     }
 }
 
