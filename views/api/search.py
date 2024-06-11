@@ -9,6 +9,7 @@ from utils.celery_utils import  bulk_write_to_collection, push_history_to_be_rec
 from utils.response import incorrect_data_response, server_error, success_response
 from tasks.push.worker import send_push_notification
 from utils.logger import get_logger
+from views.api.recipe_utils.match_ingredient import not_found_ingredient
 
 bp_search = Blueprint('search', __name__, url_prefix='/api/search')
 log = get_logger()
@@ -53,7 +54,7 @@ def search_recipe():
         _hate = _user_data.get('profile', {}).get('hate', [])
         
         
-        _searched_recipe = list(db_recipe.find(
+        _searched_recipe: list[dict[str, str]] = list(db_recipe.find(
             {
                 '$text': {'$search': f'{title} {keyword}'},
                 'ingred': {'$nin': _hate}
@@ -77,19 +78,32 @@ def search_recipe():
         if not _searched_recipe:
             return incorrect_data_response('검색 결과가 없습니다'), 404
         
+        if endpoint:
+            db_users.update_one(
+                {'sub.endpoint': endpoint},
+                {
+                    '$push': {
+                        '$each': [{
+                            'keyword': keyword,
+                            'title': title,
+                            'time': time.time(),
+                        }],
+                        '$slice': -10,
+                    }
+                }
+            )        
 
-        _searched_recipe = [
-            {
+        searched_recipe_out: list[dict[str, str]] = []
+        for recipe in _searched_recipe:
+            recipe_ingred = recipe.get('ingred', [])
+            ingred_not_found = not_found_ingredient(recipe_ingred, _ingredients)
+            
+            searched_recipe_out.append({
                 **recipe,
                 'favorite': recipe.get('_id') in _favorite,
-                'ingred404': [
-                    ingred
-                    for ingred in recipe.get('ingred', [])
-                    if ingred not in _ingredients # TODO: or 스플릿
-                ]
-            }
-            for recipe in _searched_recipe
-        ]
+                'ingred404': ingred_not_found,
+            })
+        
         
     except PyMongoError as pe:
         log.error(pe)
@@ -97,7 +111,7 @@ def search_recipe():
         
     return success_response(
         data={
-            'display_list': _searched_recipe,
+            'display_list': searched_recipe_out,
             'refrigerator': list(_ingredients),
             'hate': _hate,
             'nidx': cidx+ 20,

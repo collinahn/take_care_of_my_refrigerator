@@ -9,6 +9,7 @@ from utils.celery_utils import  bulk_write_to_collection, push_history_to_be_rec
 from utils.response import incorrect_data_response, server_error, success_response
 from tasks.push.worker import send_push_notification
 from utils.logger import get_logger
+from views.api.recipe_utils.match_ingredient import not_found_ingredient
 
 bp_recipe = Blueprint('recipe', __name__, url_prefix='/api/recipe')
 log = get_logger()
@@ -43,14 +44,15 @@ def recipe_data(recipe_id):
         return server_error()
     
     _ingredients = set([ i.get('name') for i in user_favorite_info.get('refrigerator', [])])
+    recipe_ingred = recipe_info.get('ingred', [])
+    ingred_not_found = not_found_ingredient( recipe_ingred, _ingredients)
+    
+    
+    
     return success_response('성공', data={
         **recipe_info,
         'favorite': recipe_id in user_favorite_info.get('favorite', []),
-        'ingred404': [
-            ingred
-            for ingred in recipe_info.get('ingred', [])
-            if ingred not in _ingredients
-        ],
+        'ingred404': ingred_not_found,
         'refrigerator': list(_ingredients)
     })
 
