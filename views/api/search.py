@@ -85,7 +85,7 @@ def search_recipe():
                 'ingred404': [
                     ingred
                     for ingred in recipe.get('ingred', [])
-                    if ingred not in _ingredients
+                    if ingred not in _ingredients # TODO: or 스플릿
                 ]
             }
             for recipe in _searched_recipe
