@@ -26,7 +26,8 @@ header {
 .menu a {
     text-decoration: none;
     color: black;
-    padding: 10px;
+    font-size: 14px;
+    padding: 7px;
 }
 
 .tab-menu {
