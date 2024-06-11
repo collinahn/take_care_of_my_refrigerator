@@ -6,6 +6,8 @@ import {
 const API_DOMAIN = 'https://myrefrigerator.store';
 
 const updateHateKeywordsSettings = async (hateKeywords) => {
+    if (!hateKeywords) {promptAlertMsg('warn', '키워드를 입력해주세요.'); return false;}
+    if (hateKeywords.length > 50) {promptAlertMsg('warn', '키워드는 500개까지만 입력 가능합니다.'); return false;}
     const response = await fetch(`${API_DOMAIN}/api/user/settings/profile.hate/`, {
         method: 'POST',
         headers: {
