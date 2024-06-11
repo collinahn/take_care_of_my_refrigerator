@@ -182,9 +182,12 @@ const setAutoDateForm = () => {
 const setAutocompleteForm = () => {
     const ingredNameInput = document.getElementById('ingredNameInput');
     const keywordDataList = document.getElementById('ingredName');
-    ingredNameInput.oninput = async (e) => {
+    ingredNameInput.onkeyup = async (e) => {
         if (!e?.target?.value) {
             return
+        }
+        if (e?.isComposing) {
+            return; // 한글 조합 중인 경우 추가 요청 안보냄 
         }
         try {
             const response = await fetch(`${API_DOMAIN}/api/refrigerator/autocomplete/recipe/name/?q=${e?.target?.value}`);

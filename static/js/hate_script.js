@@ -1,9 +1,42 @@
 import {
   promptAlertMsg,
-  getSubscriptionEndpoint
+  getSubscriptionEndpoint,
+  createElementWithClass
 } from "./utils.js";
 
 const API_DOMAIN = 'https://myrefrigerator.store';
+
+
+const setAutocompleteForm = () => {
+    const ingredNameInput = document.getElementById('keywordInput');
+    const keywordDataList = document.getElementById('keywordDatalist');
+    ingredNameInput.onkeyup = async (e) => {
+        if (!e?.target?.value) {
+            return
+        }
+        if (e?.isComposing) {
+            return; // 한글 조합 중인 경우 추가 요청 안보냄 
+        }
+        try {
+            const response = await fetch(`${API_DOMAIN}/api/refrigerator/autocomplete/recipe/name/?q=${e?.target?.value}`);
+            const data = await response.json();
+            if (data.data?.length > 0) {
+                const autocompletedData = []
+            data.data.forEach((kw) => {
+                const optionKeyword = createElementWithClass("option", [])
+            optionKeyword.value = kw
+            autocompletedData.push(optionKeyword)
+            })
+
+            keywordDataList.replaceChildren(...autocompletedData)
+            } else {
+                throw new Error('No data found');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+}
 
 const updateHateKeywordsSettings = async (hateKeywords, isDelete) => {
     const userEndpoint =  await getSubscriptionEndpoint();
@@ -104,4 +137,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   
     renderKeywords();
+    setAutocompleteForm();
   });  

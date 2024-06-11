@@ -208,7 +208,7 @@ def get_autocomplete_data(keyword: str, limit: int = 30) -> list:
 
     
 def set_autocomplete_index():
-    with open('./model/unique_list.py', 'r', encoding='utf-8') as f:
+    with open('./model/unique_list.txt', 'r', encoding='utf-8') as f:
         ingred: list[str] = f.readlines()
         redis_client.zadd('__autocomplete__ingred', {
             ing.encode('utf-8'): 0 for ing in ingred
