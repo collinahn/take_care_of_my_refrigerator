@@ -5,9 +5,16 @@ import {
 
 const API_DOMAIN = 'https://myrefrigerator.store';
 
-const updateHateKeywordsSettings = async (hateKeywords) => {
-    if (!hateKeywords) {promptAlertMsg('warn', '키워드를 입력해주세요.'); return false;}
-    if (hateKeywords.length > 50) {promptAlertMsg('warn', '키워드는 500개까지만 입력 가능합니다.'); return false;}
+const updateHateKeywordsSettings = async (hateKeywords, isDelete) => {
+    const userEndpoint =  await getSubscriptionEndpoint();
+    if (!userEndpoint) {
+        promptAlertMsg('warn', '기기 등록 후에 이용 가능합니다.');
+        return false;
+    }
+    if (hateKeywords.length > 50 && !isDelete) {
+        promptAlertMsg('warn', '키워드는 50개까지만 입력 가능합니다.'); 
+        return false;
+    }
     const response = await fetch(`${API_DOMAIN}/api/user/settings/profile.hate/`, {
         method: 'POST',
         headers: {
@@ -15,7 +22,7 @@ const updateHateKeywordsSettings = async (hateKeywords) => {
         },
         body: JSON.stringify({
             'data': hateKeywords || [],
-            'endpoint': await getSubscriptionEndpoint(),
+            'endpoint': userEndpoint,
         }),
     });
     const respJson = await response.json();
@@ -49,14 +56,29 @@ document.addEventListener('DOMContentLoaded', function() {
         keywordList.appendChild(li);
       });
     }
-  
+    
+    let isExist = false;
     // 키워드 추가
     keywordForm.addEventListener('submit', async (event) => {
       event.preventDefault();
-      const newKeyword = keywordInput.value.trim();
-      if (newKeyword) {
-        savedKeywords.push(newKeyword);
 
+      if (keywordInput.value.trim() === '') {
+        promptAlertMsg('warn', '키워드를 입력해주세요.', null, "warn");
+        return;
+      }
+      const newKeywords = keywordInput.value.trim().split(',');
+      if (newKeywords.length > 0) {
+        newKeywords.forEach(newKeyword => {
+            isExist = savedKeywords.includes(newKeyword.trim());
+            if (isExist) {
+                return;
+            }
+            savedKeywords.push(newKeyword.trim())
+        })
+        
+        if (isExist) {
+            promptAlertMsg('warn', '중복된 키워드를 정리하였습니다.', null, "warn");
+        }
         if (await updateHateKeywordsSettings(savedKeywords)) {
             localStorage.setItem('keywords', JSON.stringify(savedKeywords));
             renderKeywords();
@@ -74,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (index !== -1) {
         savedKeywords.splice(index, 1);
 
-        if (await updateHateKeywordsSettings(savedKeywords)) {
+        if (await updateHateKeywordsSettings(savedKeywords, true)) {
             localStorage.setItem('keywords', JSON.stringify(savedKeywords));
             renderKeywords();
         }
