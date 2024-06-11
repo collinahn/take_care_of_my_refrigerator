@@ -253,8 +253,9 @@
                         <div class="body">
                             <input type="hidden" id="ingredientInputId" name="id" value="">
                             <div class="form-row">
-                                <label for="foodName">식재료명</label>
-                                <input type="text" id="foodName" name="name" required>
+                                <label for="ingredNameInput">식재료명</label>
+                                <input type="text" id="ingredNameInput" name="name" list="ingredName" required>
+                                <datalist id="ingredName"></datalist>
                             </div>
                             <div class="form-row">
                                 <label for="storageOption">보관 방법</label>

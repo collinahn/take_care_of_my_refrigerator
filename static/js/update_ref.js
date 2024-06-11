@@ -68,8 +68,8 @@ const changeModalTitle = (title) => {
 const onSubmitForm = async (e, type) => {
     e.preventDefault();
     
-    const foodName = document.getElementById('foodName').value;
-    if (!foodName) {
+    const ingredName = document.getElementById('ingredNameInput').value;
+    if (!ingredName) {
         return
     }
     let url = `${API_DOMAIN}${ADD_API_ENDPOINT}`;
@@ -169,10 +169,38 @@ const setAutoDateForm = () => {
     }
 }
 
+const setAutocompleteForm = () => {
+    const ingredNameInput = document.getElementById('ingredNameInput');
+    const keywordDataList = document.getElementById('ingredName');
+    ingredNameInput.oninput = async (e) => {
+        if (!e?.target?.value) {
+            return
+        }
+        try {
+            const response = await fetch(`${API_DOMAIN}/api/refrigerator/autocomplete/recipe/name/?q=${e?.target?.value}`);
+            const data = await response.json();
+            if (data.data?.length > 0) {
+                const autocompletedData = []
+            data.data.forEach((kw) => {
+                const optionKeyword = createElementWithClass("option", [])
+            optionKeyword.value = kw
+            autocompletedData.push(optionKeyword)
+            })
+
+            keywordDataList.replaceChildren(...autocompletedData)
+            } else {
+                throw new Error('No data found');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const addItemButton = document.querySelector('.add');
-    if (addItemButton) {
-        addItemButton.addEventListener('click', (e) => {
+if (addItemButton) {
+    addItemButton.addEventListener('click', (e) => {
             changeModalTitle('식재료 추가');
             enableAddedDate();
             resetForm();
@@ -215,5 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     loadItems();
+    setAutocompleteForm();
 
 });
