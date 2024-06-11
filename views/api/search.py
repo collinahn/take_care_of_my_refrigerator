@@ -83,12 +83,14 @@ def search_recipe():
                 {'sub.endpoint': endpoint},
                 {
                     '$push': {
-                        '$each': [{
+                        'profile.search': {
+                             '$each': [{
                             'keyword': keyword,
                             'title': title,
                             'time': time.time(),
                         }],
-                        '$slice': -10,
+                            '$slice': -10,
+                        }
                     }
                 }
             )        
