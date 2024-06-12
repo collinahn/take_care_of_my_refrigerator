@@ -195,9 +195,9 @@ def recommended_recipe():
             {
                 **recipe,
                 'ingred404': not_found_ingredient(recipe.get('ingred', []), _ingredients),
-                'favorite': _favorite,
+                'favorite': recipe.get('_id') in _favorite,
             } for recipe in _recommended_recipe
-            if not overlapping_ingredient(recipe.get('ingred', []), _hatelist)
+            if recipe and not overlapping_ingredient(recipe.get('ingred', []), _hatelist)
         ],
         'hate': _hatelist,
     })

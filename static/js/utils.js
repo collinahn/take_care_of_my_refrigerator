@@ -619,9 +619,23 @@ export const requestRecommendRecipe = async () => {
     try {
         const response = await fetch(`${API_DOMAIN}/api/recipe/recommended/?endpoint=${userEndpoint}`);
         const data = await response.json();
-        return data;
+        return data?.data || {};
     } catch (e) {
         console.error(e);
         return {};
     }
+}
+
+export const setUpRecommendRecipe = async (displayArea) => {
+    const data = await requestRecommendRecipe();
+    const recipeList = data?.display_list;
+    if (recipeList?.length == 0) {
+        displayArea.replaceChildren();
+        return;
+    }
+    recipeList?.forEach(recipe => {
+        const recipeItem = createRecipeItem(recipe);
+        displayArea.appendChild(recipeItem);
+    });
+
 }

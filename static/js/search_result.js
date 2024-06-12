@@ -5,18 +5,35 @@ import {
     getSubscriptionEndpoint,
     setFavorite,
     deleteFavorite,
-    createRecipeItem
+    createRecipeItem,
+    setUpRecommendRecipe,
 } from './utils.js';
 
 const API_DOMAIN = 'https://myrefrigerator.store';
 // const API_DOMAIN = 'http://127.0.0.1:4000';
+
+const removeRecommendBanner = () => {
+    try{
+
+        const recommendRecipe = document.getElementById('recommendRecipe');
+        if (recommendRecipe) {
+            recommendRecipe.style.opacity = '0';
+            recommendRecipe.ontransitionend = (e) => {
+                recommendRecipe.style.display = 'none';
+                recommendRecipe.ontransitionend = null;
+            }
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
 
 const getSearchResult = async (formData, forceCidx, sortFilter) => {
     const resultArea = document.querySelector('.recipe-list');
     const cidx = forceCidx ?? (resultArea.querySelectorAll('.recipe-item')?.length || 0);
     const searchSortFilter = document.getElementById('filter');
     const searchSortFilterValue = searchSortFilter?.value || "";
-
+    
     const response = await fetch(`${API_DOMAIN}/api/search/recipe/?${new URLSearchParams(formData).toString()}&cidx=${cidx}&sort=${searchSortFilterValue}`);
     const respJson = await response.json();
     if (respJson.resp_code === 'RET000') {
@@ -26,19 +43,22 @@ const getSearchResult = async (formData, forceCidx, sortFilter) => {
             promptAlertMsg('warn', '검색 결과가 없습니다.');
             return;
         }
-
+            
         renderSearchedSearchArea();
         recipeData.forEach((recipe) => {
             const recipeItem = createRecipeItem(recipe);
             resultArea.appendChild(recipeItem);
-        });
-
+            });
+            
         if (respJson.data.nidx !== -1) {
             addSeeMoreButtonRecursive(formData);
         }
+        removeRecommendBanner()
     } else {
         promptAlertMsg('warn', respJson?.server_msg || '검색 결과를 가져오는데 실패했습니다.');
     }
+
+
 }
 
 const getFavorites = async () => {
@@ -360,6 +380,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         })
         await getSearchResult(formData, 0, sortFilter);
     }
-
-
+    setUpRecommendRecipe(document.getElementById('recommendRecipe'));
 });

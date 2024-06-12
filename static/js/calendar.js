@@ -1,4 +1,4 @@
-import { getSubscriptionEndpoint, promptAlertMsg, requestRecommendRecipe, createRecipeItem } from "./utils.js";
+import { getSubscriptionEndpoint, promptAlertMsg, setUpRecommendRecipe, requestRecommendRecipe, createRecipeItem } from "./utils.js";
 
 const API_DOMAIN = 'https://myrefrigerator.store';
 const GET_API_ENDPOINT = '/api/refrigerator/';
@@ -108,20 +108,7 @@ const setupCalendar = () => {
     monthSelect.onchange = changeYearMonth;
 }
 
-const setUpRecommendRecipe = async () => {
-    const displayArea = document.getElementById('recommendRecipe');
-    const data = await requestRecommendRecipe();
-    const recipeList = data?.display_list;
-    if (recipeList?.length == 0) {
-        return;
-    }
 
-    recipeList?.forEach(recipe => {
-        const recipeItem = createRecipeItem(recipe);
-        displayArea.appendChild(recipeItem);
-    });
-
-}
 
 document.addEventListener("DOMContentLoaded", async ()=> {
     generateYearOptions();
@@ -140,5 +127,5 @@ document.addEventListener("DOMContentLoaded", async ()=> {
     }
     setupCalendar();
     generateCalendar(currentYear, currentMonth, itemsByDate);
-    setUpRecommendRecipe();
+    setUpRecommendRecipe(document.getElementById('recommendRecipe'));
 });
