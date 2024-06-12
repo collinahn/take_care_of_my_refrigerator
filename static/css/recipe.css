@@ -182,7 +182,7 @@ footer p {
 .use-recipe .show-modal:hover {
     color: white;
 }
-.bottom-sheet form {
+.bottom-sheet #modalBody form {
     display: flex;
     flex-direction: column;
     padding-bottom: 30px;
@@ -211,7 +211,7 @@ footer p {
     background-color: #426B1F;
     font-weight: bold;
 }
-.bottom-sheet button[type="submit"] {
+.bottom-sheet #modalBody button[type="submit"] {
     padding: 10px;
     border: none;
     color: black;

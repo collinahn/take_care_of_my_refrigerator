@@ -182,9 +182,9 @@ def recommended_recipe():
     
     _recommended_recipe = user_info[0].get('matchedRecipe', [])
     _favorite = user_info[0].get('favorite', []) or []
-    _user_ref = user_info[0].get('refrigerator', [])
+    _user_ref = user_info[0].get('refrigerator', []) or []
     _ingredients = set([ i.get('name') for i in _user_ref])
-    _hatelist = user_info[0].get('profile', {}).get('hate', [])
+    _hatelist = user_info[0].get('profile', {}).get('hate', []) or []
     
     
     if not _recommended_recipe:
