@@ -2,6 +2,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     const tabs = document.querySelectorAll('.tab-link');
     const filterSelect = document.getElementById('filter');
+    const closePopupButton = document.getElementById('closePopup');
+    const popupContent = document.querySelector('.popup-content');
+
+    closePopupButton.addEventListener('click', () => {
+        popupContent.style.display = 'none';
+    });
     
     function updateItems(category) {
         const items = document.querySelectorAll('.item');
@@ -92,7 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     filterSelect.addEventListener('change', (event) => {
         const selectedFilter = event.target.value;
-        // 필터링된 아이템들을 표시하는 함수 호출
         console.log(selectedFilter)
         sortItems(selectedFilter);
     });
