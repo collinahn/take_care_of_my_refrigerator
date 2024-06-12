@@ -7,6 +7,7 @@ celery_app = Celery(
     backend="redis://127.0.0.1:6379/0",
     include=[
         'tasks.push.worker',
+        'tasks.recommend.worker'
     ],
     result_expires=60*60
 )

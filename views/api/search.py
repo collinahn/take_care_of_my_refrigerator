@@ -7,7 +7,7 @@ from db.mongo import db_users, db_recipe
 from utils.pwa_push import PushMsgFormat, PushSettings
 from utils.celery_utils import  bulk_write_to_collection, push_history_to_be_recorded
 from utils.response import incorrect_data_response, server_error, success_response
-from tasks.push.worker import send_push_notification
+from tasks.recommend.worker import create_recommended_recipe
 from utils.logger import get_logger
 from views.api.recipe_utils.match_ingredient import not_found_ingredient
 
@@ -154,6 +154,8 @@ def search_recipe():
             return incorrect_data_response('검색 결과가 없습니다'), 404
         
         if endpoint:
+            if keyword:
+                create_recommended_recipe.delay(endpoint, keyword)
             db_users.update_one(
                 {'sub.endpoint': endpoint},
                 {

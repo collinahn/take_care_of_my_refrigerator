@@ -42,4 +42,8 @@ def keyword_recipe(keyword, cnt):
     ob_list = list(result['ObjectId'])
     return ob_list
 
-print(keyword_recipe('다이어트', 3))
+
+if __name__ == '__main__':
+
+    
+    print(keyword_recipe('다이어트', 3))
