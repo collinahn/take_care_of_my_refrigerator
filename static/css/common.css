@@ -1,3 +1,10 @@
+/* fix html, body */
+html, body {
+  position: relative;
+  width: 100%;
+  overflow-x: hidden;
+}
+
 /* message */
 #myref_alert {
   position: fixed;
