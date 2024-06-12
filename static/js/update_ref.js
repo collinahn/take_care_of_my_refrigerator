@@ -4,7 +4,6 @@ import {
     createElementWithClassV2,
     promptAlertMsg, 
     removeFadeOut, 
-    updateBanner,
     getRecommendList,
     createRecipeItem 
 } from './utils.js';

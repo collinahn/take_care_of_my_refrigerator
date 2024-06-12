@@ -22,6 +22,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
+        // if element is not found, display info
+        const visibleItems = Array.from(document.querySelector('.items').children).filter(item => item.style.display !== 'none');
+        if (visibleItems.length === 0) {
+            if (document.querySelector('#noItem')) {
+                document.querySelector('#noItem').remove();
+            }
+            const noItem = document.createElement('li');
+            noItem.id = 'noItem';
+            noItem.classList.add('item');
+            noItem.textContent = `${category} 보관에 해당하는 아이템이 없습니다.`;
+            document.querySelector('.items').appendChild(noItem);
+        } else {
+            if (document.querySelector('#noItem')) {
+                document.querySelector('#noItem').style.display = 'none';
+            }
+        }
     }
 
     function sortItems(category) {
