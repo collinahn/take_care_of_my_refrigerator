@@ -628,9 +628,16 @@ export const requestRecommendRecipe = async () => {
 
 export const setUpRecommendRecipe = async (displayArea) => {
     const data = await requestRecommendRecipe();
-    const recipeList = data?.display_list;
+    const recipeList = data?.display_list || [];
     if (recipeList?.length == 0) {
-        displayArea.replaceChildren();
+        displayArea.appendChild(createElementWithClassV2('div', ['no-recipe'], {
+            innerText: '| 관심사 분석 중입니다.', 
+            style: {
+                'font-size': 'small',
+                margin: '20px', 
+                color: 'gray'
+            }
+        }));
         return;
     }
     recipeList?.forEach(recipe => {
@@ -657,7 +664,7 @@ export const getRecommendList = async () => {
         formKeywordInput.onsubmit = async (e) => {
             e.preventDefault();
             formKeywordInput.querySelector('input[type="search"]').blur();
-            formKeywordInput.querySelectorAll('input[type="radio"]')?.forEach(radio => {
+            formKeywordInput.querySelectorAll('input[type="radio"]')?.forEach?.(radio => {
                 radio.checked = false;
             })
             await updateBanner(formKeywordInput.querySelector('input[type="search"]').value)

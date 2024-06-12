@@ -63,13 +63,24 @@ const getSearchResult = async (formData, forceCidx, sortFilter) => {
 
 const getFavorites = async () => {
     const resultArea = document.querySelector('#favorites');
+    const userEndpoint = await getSubscriptionEndpoint();
 
-    const response = await fetch(`${API_DOMAIN}/api/user/favorite/?endpoint=${await getSubscriptionEndpoint()}`);
+    if (!userEndpoint) {
+        resultArea.textContent = '기기 등록이 필요합니다.';
+        resultArea.style.display = 'flex'
+        resultArea.style.alignContent = 'center';
+        return;
+    }
+
+
+    const response = await fetch(`${API_DOMAIN}/api/user/favorite/?endpoint=${userEndpoint}`);
     const respJson = await response.json();
     if (respJson.resp_code === 'RET000') {
         const recipeData = respJson?.data;
         if (!recipeData || recipeData.length === 0) {
             resultArea.textContent = '즐겨찾기한 레시피가 없습니다.';
+            resultArea.style.display = 'flex'
+            resultArea.style.alignContent = 'center';
             return;
         }
 
@@ -90,6 +101,8 @@ const getRecentViews = async () => {
 
     if (viewedRecipes.length === 0) {
         resultArea.textContent = '최근 본 레시피가 없습니다.';
+        resultArea.style.display = 'flex'
+        resultArea.style.alignContent = 'center';
         return;
     }
 

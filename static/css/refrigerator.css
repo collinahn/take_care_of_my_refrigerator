@@ -1,7 +1,9 @@
 body {
+    position: relative;
     margin: 0;
     font-family: Arial, sans-serif;
-    padding-bottom: 100px;
+    padding-bottom: 10px;
+    min-height: 100vh;
 }
 
 header {
@@ -9,6 +11,10 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+main {
+    min-height: 90vh;
 }
 
 .logo img {
@@ -315,7 +321,6 @@ input[type="search"] {
 }
 
 footer {
-    position: fixed;
     bottom: 0;
     width: 100%;
     text-align: center;

@@ -73,6 +73,25 @@ export const setUpFavoriteButton = async (isFavorite) => {
     }
 }
 
+const createIngredientSearchButton = (ingredName) => {
+    return createElementWithClassV2('div', [], null, null, [
+        createElementWithClassV2('input', [], {
+            type:'radio',
+            name: 'keyword',
+            id: `keyword-${ingredName}`,
+            value: ingredName,
+            onchange: async (e) => {
+                const ingredientTextIndex = ingredName?.length > 3 ? ingredName.split('').join(' ') : "";
+                await updateBanner(`${ingredName} ${ingredientTextIndex} ${ingredName.slice(0, 2)} ${ingredName.slice(2)} ${ingredName.slice(0, 3)} ${ingredName.slice(3)}`)
+            }
+        }),
+        createElementWithClassV2('label', [], {
+            for: `keyword-${ingredName}`,
+            innerText: ingredName,
+        })
+    ])
+}
+
 const getSearchResult = async (formData) => {
     const resultArea = document.querySelector('.recipe-card')
     const titleH3 = resultArea.querySelector('#recipe-title');
@@ -137,24 +156,17 @@ const getSearchResult = async (formData) => {
             ingredientLi.innerText = `❌ ${ingredient}`;
             ingredientList.appendChild(ingredientLi);
 
-            searchTrigger.appendChild(
-                createElementWithClassV2('input', [], {
-                    type:'radio',
-                    name: 'keyword',
-                    id: `keyword-${ingredient}`,
-                    value: ingredient,
-                    onchange: async (e) => {
-                        const ingredientTextIndex = ingredient?.length > 3 ? ingredient.split('').join(' ') : "";
-                        await updateBanner(`${ingredient} ${ingredientTextIndex} ${ingredient.slice(0, 2)} ${ingredient.slice(2)} ${ingredient.slice(0, 3)} ${ingredient.slice(3)}`)
-                    }
+            if (ingredient.includes('or')) {
+                ingredient.split('or').forEach((orIngredient) => {
+                    searchTrigger.appendChild(
+                        createIngredientSearchButton(orIngredient)
+                    )
                 })
-            )
-            searchTrigger.appendChild(
-                createElementWithClassV2('label', [], {
-                    for: `keyword-${ingredient}`,
-                    innerText: ingredient,
-                })
-            )
+            } else {
+                searchTrigger.appendChild(
+                    createIngredientSearchButton(ingredient)
+                )
+            }
         });
         recipeStep.replaceChildren();
         recipeData.recipe.forEach((step, idx) => {

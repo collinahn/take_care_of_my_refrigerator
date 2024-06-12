@@ -2,7 +2,7 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
 
-    padding-bottom: 100px;
+    padding-bottom: 10px;
 }
 
 header {
@@ -10,6 +10,10 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+main {
+    min-height: 90vh;
 }
 
 li {
@@ -155,7 +159,6 @@ hr {
 }
 
 footer {
-    position: fixed;
     bottom: 0;
     width: 100%;
     text-align: center;

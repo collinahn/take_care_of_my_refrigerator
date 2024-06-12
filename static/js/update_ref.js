@@ -124,7 +124,7 @@ const onSubmitForm = async (e, type) => {
         }
         e.target.reset();
         hideBottomSheet();
-        if (userRefrigeratorItemsArray.length >= 5) {
+        if (userRefrigeratorItemsArray.length >= 3) {
             loadUserMatchingRecipeItems();
         }
         return
@@ -194,7 +194,7 @@ const loadItems = async () => {
         itemsArea.replaceChildren(...userRefrigeratorItemsArray.map((ingredient) => createIngredientItem(ingredient)));
     }
 
-    if (userRefrigeratorItemsArray.length >= 5) {
+    if (userRefrigeratorItemsArray.length >= 3) {
         loadUserMatchingRecipeItems()
 
     }

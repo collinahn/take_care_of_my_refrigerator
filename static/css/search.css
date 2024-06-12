@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    padding-bottom: 100px;
+    min-height: 100vh;
 }
 
 header {
@@ -49,6 +49,9 @@ header {
     font-weight: bold;
     background-color: rgba(66, 107, 31, 0.3);
     color: black;
+}
+main {
+    min-height: 90vh;
 }
 
 hr {
@@ -291,7 +294,6 @@ p {
 }
 
 footer {
-    position: fixed;
     bottom: 0;
     width: 100%;
     text-align: center;

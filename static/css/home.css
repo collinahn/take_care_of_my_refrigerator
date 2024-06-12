@@ -1,7 +1,6 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  padding-bottom: 100px;
 }
 
 header {
@@ -56,6 +55,10 @@ header {
   content: url('/main/refrigerator.jpg');
 }
 
+main {
+  min-height: 90vh;
+}
+
 .main {
   padding: 20px;
   text-align: center;
@@ -80,8 +83,6 @@ img {
 }
 
 footer {
-  position: fixed;
-  bottom: 0;
   width: 100%;
   text-align: center;
   padding: 5px;

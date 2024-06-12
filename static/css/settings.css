@@ -1,7 +1,8 @@
 body {
+    position: relative;
     margin: 0;
     font-family: Arial, sans-serif;
-    padding-bottom: 100px;
+    min-height: 100vh;
 }
 
 header {
@@ -120,8 +121,6 @@ hr {
 }
 
 footer {
-    position: fixed;
-    bottom: 0;
     width: 100%;
     text-align: center;
     padding: 5px;
