@@ -43,7 +43,7 @@ const getSearchResult = async (formData, forceCidx, sortFilter) => {
             promptAlertMsg('warn', '검색 결과가 없습니다.');
             return;
         }
-            
+        
         renderSearchedSearchArea();
         recipeData.forEach((recipe) => {
             const recipeItem = createRecipeItem(recipe);
@@ -142,8 +142,8 @@ const addSeeMoreButtonRecursive = (formData) => {
         resultArea.appendChild(seeMoreButton);
     }, 1500);
     seeMoreButton.onclick = () => {
-        getSearchResult(formData);
         removeFadeOut(seeMoreButton);
+        getSearchResult(formData);
     }
 
 }
@@ -154,6 +154,7 @@ const renderDefaultSearchArea = () => {
     const container = document.querySelector('#search-interaction');
     const searchInputArea = document.querySelector("#search");
     const searchResultIndicator = document.querySelector(".filter-container")
+    container.dataset.state = "maximized"
     if (searchResultIndicator) {
         searchResultIndicator.style.transform = "translateX(-50px)";
         searchResultIndicator.style.opacity = "0";
@@ -177,6 +178,7 @@ const renderSearchedSearchArea = () => {
     const container = document.querySelector('#search-interaction');
     const searchInputArea = document.querySelector("#search");
     const searchResultIndicator = document.querySelector(".filter-container")
+    container.dataset.state = "minimized"
     if (searchInputArea){
         searchInputArea.style.transformOrigin = "top left";
         searchInputArea.style.transform = "translateX(-50px)";
@@ -199,6 +201,7 @@ const renderSearchedSearchArea = () => {
                 }, 100);
             }
             container.style.height = "35px";
+            container.style.display = "block";
         }
     }
 }
@@ -298,8 +301,10 @@ const createRecentRecipe = (recipeData) => {
 async function activateTab(evt, tabName) {
     let i, tablinks, contentBoxes;
     const recipeListArea = document.querySelector('.recipe-list');
+    const searchInteractions = document.querySelector('#search-interaction');
 
     tablinks = document.getElementsByClassName("tab-link");
+
     for (i = 0; i < tablinks.length; i++) {
         tablinks[i].classList.remove("active");
     }
@@ -312,15 +317,19 @@ async function activateTab(evt, tabName) {
     evt.currentTarget.className += " active";
 
     if (tabName === "search") {
-        document.getElementById("search-interaction").style.display = "block";
-        if (document.querySelector('.recipe-list')?.children?.length !== 0) {
+        searchInteractions.style.display = "block";
+        if (searchInteractions.dataset.state === "maximized") {
+            document.getElementById("search").style.display = "block";
+        } else if (searchInteractions.dataset.state === "minimized") {
+            document.getElementById("search").style.display = "none";
+        } else if (recipeListArea?.children?.length !== 0) {
             document.getElementById("search").style.display = "none";
         } else {
             document.getElementById("search").style.display = "block";
         }
         recipeListArea.style.display = "flex";
     } else {
-        document.getElementById("search-interaction").style.display = "none";
+        searchInteractions.style.display = "none";
         document.getElementById(tabName).style.display = "block"; 
         recipeListArea.style.display = "none";
     }

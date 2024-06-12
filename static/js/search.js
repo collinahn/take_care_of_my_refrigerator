@@ -14,10 +14,15 @@ function activateTab(evt, tabName) {
 
     evt.currentTarget.className += " active";
 
+    console.log(tabName, recipeListArea?.children?.length, document.getElementById("search").style.display)
     if (tabName === "search") {
         document.getElementById("search-interaction").style.display = "block";
-        if (document.querySelector('.recipe-list')?.children?.length !== 0) {
-            document.getElementById("search").style.display = "none";
+        if (recipeListArea?.children?.length !== 0) {
+            if (document.getElementById("search").style.display === "none") {
+                document.getElementById("search").style.display = "block";
+            } else {
+                document.getElementById("search").style.display = "none";
+            }
         } else {
             document.getElementById("search").style.display = "block";
         }

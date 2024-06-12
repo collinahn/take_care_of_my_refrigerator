@@ -81,6 +81,9 @@ const createIngredientSearchButton = (ingredName) => {
             id: `keyword-${ingredName}`,
             value: ingredName,
             onchange: async (e) => {
+                if (ingredName === '백설탕' || ingredName === '흑설탕') {
+                    ingredName = '설탕';
+                }
                 const ingredientTextIndex = ingredName?.length > 3 ? ingredName.split('').join(' ') : "";
                 await updateBanner(`${ingredName} ${ingredientTextIndex} ${ingredName.slice(0, 2)} ${ingredName.slice(2)} ${ingredName.slice(0, 3)} ${ingredName.slice(3)}`)
             }
@@ -108,7 +111,7 @@ const getSearchResult = async (formData) => {
             value: '',
             checked: true,
             onchange: async (e) => {
-            await updateBanner()
+                await updateBanner()
             },
         })
     )

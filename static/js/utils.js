@@ -556,7 +556,16 @@ export const createRecipeItem = (recipeData, isFavoriteView) => {
         if (isFavorite) {
             if (await deleteFavorite(recipeData?._id)) {
                 e.target.innerHTML = e.target.innerHTML === '☆' ? '★' : '☆';
-                if (isFavoriteView) {
+                if (isFavoriteView !== undefined) {
+                    if (document.querySelector('#favorites')?.childElementCount === 1) {
+                        setTimeout(() => {
+                            document.querySelector('#favorites').innerText = '즐겨찾기에 추가된 레시피가 없습니다.'
+                            //display: flex; align-content: center;
+                            document.querySelector('#favorites').style.display = 'flex';
+                            document.querySelector('#favorites').style.alignContent = 'center';
+                            
+                        }, 1000);
+                    }
                     removeFadeOut(e.target.closest('.recipe-item'));
                 }
             }
