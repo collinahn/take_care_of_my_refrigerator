@@ -203,7 +203,12 @@ def delete_ingredients(endpoint: str, ingredients_id: str) -> bool:
         log.error(e)
         raise InvalidIngredientError('올바르지 않은 재료형식입니다.')
     
-def delete_many_ingredients_by_name(endpoint: str, ingredients_ids:list) -> bool:
+def delete_many_ingredients_by_name(endpoint: str, ingredients_ids: list[str]) -> bool:
+    ingredients_ids = [ iid for iid in ingredients_ids if iid]
+    for iid in ingredients_ids:
+        if 'or' in iid:
+            ingredients_ids.extend(iid.split('or'))
+        
     try:
         update_res = db_users.update_one(
             {'sub.endpoint': endpoint}, 
