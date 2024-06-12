@@ -33,11 +33,13 @@ def search_recipe():
     endpoint = request.args.get('endpoint')
     cidx = int(request.args.get('cidx', 0))
     sort = request.args.get('sort', 'DEFAULT')
+    use_aggregation = sort == 'INGRED'
     sort_method = ()
-    if sort == "COOKTIME":
+    if sort == 'COOKTIME':
         sort_method = (
             'cook_time', 1
         )
+        
     
     try:
         _user_data = db_users.find_one(
@@ -53,27 +55,100 @@ def search_recipe():
         _favorite = _user_data.get('favorite', [])
         _hate = _user_data.get('profile', {}).get('hate', [])
         
-        
-        _searched_recipe: list[dict[str, str]] = list(db_recipe.find(
-            {
-                '$text': {'$search': f'{title} {keyword}'},
-                'ingred': {'$nin': _hate}
-            },
-            {
-                'title': 1,
-                'image': 1,
-                'url': 1,
-                'cook_time': 1,
-                'portion': 1,
-                'ingredients': 1,
-                'tags': 1,
-                'ingred': 1,
-                'difficulty': 1,
-                'score': {'$meta': 'textScore'}
-            }
-        ).sort([
-            sort_method, ('score', {'$meta': 'textScore'})
-        ] if sort_method else [('score', {'$meta': 'textScore'})]).skip(cidx).limit(20))
+        if not use_aggregation:
+            _searched_recipe: list[dict[str, str]] = list(db_recipe.find(
+                {
+                    '$text': {'$search': f'{title} {keyword}'},
+                    'ingred': {'$nin': _hate}
+                },
+                {
+                    'title': 1,
+                    'image': 1,
+                    'url': 1,
+                    'cook_time': 1,
+                    'portion': 1,
+                    'ingredients': 1,
+                    'tags': 1,
+                    'ingred': 1,
+                    'difficulty': 1,
+                    'score': {'$meta': 'textScore'}
+                }
+            ).sort([
+                sort_method, ('score', {'$meta': 'textScore'})
+            ] if sort_method else [('score', {'$meta': 'textScore'})]).skip(cidx).limit(20))
+            
+        else:    
+            # Aggregation pipeline
+            pipeline = [
+                {
+                    "$match": {
+                        'ingred': {'$nin': _hate},
+                        '$text': {'$search': f'{title} {keyword}'},
+                    }
+                },
+                {
+                    "$addFields": {
+                        "expandedIngred": {
+                            "$reduce": {
+                                "input": "$ingred",
+                                "initialValue": [],
+                                "in": {
+                                    "$concatArrays": [
+                                        "$$value",
+                                        {
+                                            "$cond": {
+                                                "if": { "$regexMatch": { "input": "$$this", "regex": "or" } },
+                                                "then": { "$split": ["$$this", "or"] },
+                                                "else": ["$$this"]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                { "$unwind": "$expandedIngred" },
+                {
+                    "$group": {
+                        "_id": "$_id",
+                        "menu": { "$first": "$menu" },
+                        "title": { "$first": "$title" },
+                        "image": { "$first": "$image" },
+                        "timeMins": { "$first": "$timeMins" },
+                        "ingred": { "$first": "$ingred" },
+                        "ingredients": { "$first": "$ingredients"},
+                        "cook_time": { "$first": "$cook_time" },
+                        "recipe": { "$first": "$recipe" },
+                        "portion": { "$first": "$portion" },
+                        "difficulty": { "$first": "$difficulty" },
+                        "tags": { "$first": "$tags" },
+                        "expandedIngred": { "$addToSet": "$expandedIngred" }
+                    }
+                },
+                {
+                    "$addFields": {
+                        "matchingCount": {
+                            "$size": {
+                                "$setIntersection": ["$expandedIngred", list(_ingredients)]
+                            }
+                        }
+                    }
+                },
+                { 
+                    "$sort": { 
+                        "matchingCount": -1, 
+                    } 
+                },
+                {
+                    "$skip": cidx
+                },
+                {
+                    "$limit": 20
+                }
+            ]
+            _searched_recipe: list[dict[str, str]] = list(db_recipe.aggregate(pipeline))
+                        
         
         if not _searched_recipe:
             return incorrect_data_response('검색 결과가 없습니다'), 404
@@ -116,7 +191,7 @@ def search_recipe():
             'display_list': searched_recipe_out,
             'refrigerator': list(_ingredients),
             'hate': _hate,
-            'nidx': cidx+ 20,
+            'nidx': cidx+ 20 if len(_searched_recipe) == 20 else -1,
         },
     )
         

@@ -7,14 +7,16 @@ import {
     deleteFavorite
 } from './utils.js';
 
-const API_DOMAIN = 'https://myrefrigerator.store';
-// const API_DOMAIN = 'http://127.0.0.1:5000';
+// const API_DOMAIN = 'https://myrefrigerator.store';
+const API_DOMAIN = 'http://127.0.0.1:4000';
 
 const getSearchResult = async (formData, forceCidx, sortFilter) => {
     const resultArea = document.querySelector('.recipe-list');
     const cidx = forceCidx ?? (resultArea.querySelectorAll('.recipe-item')?.length || 0);
+    const searchSortFilter = document.getElementById('filter');
+    const searchSortFilterValue = searchSortFilter?.value || "";
 
-    const response = await fetch(`${API_DOMAIN}/api/search/recipe/?${new URLSearchParams(formData).toString()}&cidx=${cidx}&sort=${sortFilter ||"DEFAULT"}`);
+    const response = await fetch(`${API_DOMAIN}/api/search/recipe/?${new URLSearchParams(formData).toString()}&cidx=${cidx}&sort=${searchSortFilterValue}`);
     const respJson = await response.json();
     if (respJson.resp_code === 'RET000') {
         promptAlertMsg('info', respJson?.server_msg);
@@ -29,6 +31,10 @@ const getSearchResult = async (formData, forceCidx, sortFilter) => {
             const recipeItem = createRecipeItem(recipe);
             resultArea.appendChild(recipeItem);
         });
+
+        if (respJson.data.nidx !== -1) {
+            addSeeMoreButtonRecursive(formData);
+        }
     } else {
         promptAlertMsg('warn', respJson?.server_msg || '검색 결과를 가져오는데 실패했습니다.');
     }
@@ -405,9 +411,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             removeFadeOut(child);
         })
         await getSearchResult(formData, 0);
-        if (document.querySelector('.recipe-list')?.children?.length !== 0) {
-            addSeeMoreButtonRecursive(formData);
-        }
     }
 
     const searchSortFilter = document.getElementById('filter');
@@ -420,9 +423,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             removeFadeOut(child);
         })
         await getSearchResult(formData, 0, sortFilter);
-        if (document.querySelector('.recipe-list')?.children?.length !== 0) {
-            addSeeMoreButtonRecursive(formData);
-        }
     }
 
 
