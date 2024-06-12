@@ -189,6 +189,7 @@ def search_recipe():
         return server_error('잠시 후 다시 이용해주세요'), 500
         
     return success_response(
+        '레시피를 불러왔어요',
         data={
             'display_list': searched_recipe_out,
             'refrigerator': list(_ingredients),

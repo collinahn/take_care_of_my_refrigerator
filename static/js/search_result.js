@@ -4,7 +4,8 @@ import {
     removeFadeOut,
     getSubscriptionEndpoint,
     setFavorite,
-    deleteFavorite
+    deleteFavorite,
+    createRecipeItem
 } from './utils.js';
 
 const API_DOMAIN = 'https://myrefrigerator.store';
@@ -195,92 +196,7 @@ const getLastKeys = (ingredients) => {
     return lastKeys;
 }
 
-const ingredientArea = (ingredients, ingredients404) => {
-    const ingredientList = createElementWithClass('div', ['ingredient-list']);
-    ingredients?.forEach(ingredient => {
-        if (ingredients404?.includes(ingredient)) {
-            ingredientList.appendChild(createElementWithClass('span', ['available-ingredient', 'missing'], ingredient));
-        } else {
-            ingredientList.appendChild(createElementWithClass('span', ['available-ingredient'], ingredient));
-        }
-        ingredientList.appendChild(createElementWithClass('span', ['ingredient-separator'], ', '));
-    });
-    return ingredientList;
-}
 
-const createRecipeItem = (recipeData, isFavoriteView) => {
-    const isFavorite = recipeData?.favorite || false;
-    const foodImageHeader = createElementWithClass('div', ['food-image']);
-    const thumbContainer = createElementWithClass('div', ['thumb-container']);
-    const favoriteButton = createElementWithClass('button', ['star-button'], isFavorite ? '★' : '☆');
-    favoriteButton.onclick = async (e) => {
-        e.preventDefault();
-        const isFavorite = e.target.innerHTML === '★';
-        if (isFavorite) {
-            if (await deleteFavorite(recipeData?._id)) {
-                e.target.innerHTML = e.target.innerHTML === '☆' ? '★' : '☆';
-                if (isFavoriteView) {
-                    removeFadeOut(e.target.closest('.recipe-item'));
-                }
-            }
-        } else {
-            if (await setFavorite(recipeData?._id)) {
-                e.target.innerHTML = e.target.innerHTML === '☆' ? '★' : '☆';
-            }
-        }
-    }
-    thumbContainer.appendChild(favoriteButton);
-    const foodThumbnail = createElementWithClass('img');
-    foodThumbnail.src = recipeData?.image;
-    foodThumbnail.alt = recipeData?.title;
-    foodThumbnail.loading = 'lazy';
-    foodThumbnail.referrerpolicy = 'no-referrer';
-    thumbContainer.appendChild(foodThumbnail);
-    foodImageHeader.appendChild(thumbContainer);
-    const cookTime = createElementWithClass('div', ['cook-time']);
-    if (recipeData?.cook_time) {
-        cookTime.textContent = `약 ${recipeData?.cook_time}분 소요`;
-        cookTime.style.textAlign = 'center';
-    }
-    foodImageHeader.appendChild(cookTime);
-    
-    const foodHeader = createElementWithClass('div', ['food-header']);
-    const foodName = createElementWithClass('div', ['food-name'], null, recipeData?.title);
-    
-    foodHeader.appendChild(foodName);
-    
-    const ingredientList = createElementWithClass('div', ['ingredient-list']);
-    // const noIngredient = createElementWithClass('div', ['no-ingredient'], `없는 재료: ${recipeData?.ingred404?.join(', ')}`);
-    // const availableIngredient = createElementWithClass('div', ['available-ingredient'], recipeData?.ingred?.join(', '));
-
-    
-    // if (recipeData?.ingred404?.length > 0) {
-    //     ingredientList.appendChild(noIngredient);
-    // }
-    // ingredientList.appendChild(availableIngredient);
-    ingredientList.appendChild(ingredientArea(recipeData?.ingred, recipeData?.ingred404));
-    if (recipeData?.matchingCount) {
-        const matchingCount = createElementWithClass('div', ['matching-count'], `일치하는 재료: ${recipeData?.matchingCount}개`);
-        matchingCount.style.paddingTop = '5px';
-        ingredientList.appendChild(matchingCount);
-    }
-    
-    const foodDetails = createElementWithClass('div', ['food-details']);
-    foodDetails.appendChild(foodHeader);
-    foodDetails.appendChild(ingredientList);
-
-
-    const recipeItem = createElementWithClass('a', ['recipe-item']);
-    if (recipeData?._id) {
-        recipeItem.href = `/recipe/${recipeData?._id}`;
-        recipeItem.id = recipeData._id;
-        recipeItem.style.textDecoration = 'none';
-    }
-    recipeItem.appendChild(foodImageHeader);
-    recipeItem.appendChild(foodDetails);
-
-    return recipeItem;
-}
 const createRecentRecipe = (recipeData) => {
     const isFavorite = recipeData?.favorite || false;
     const foodImageHeader = createElementWithClass('div', ['food-image']);

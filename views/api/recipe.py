@@ -9,7 +9,7 @@ from utils.celery_utils import  bulk_write_to_collection, push_history_to_be_rec
 from utils.response import incorrect_data_response, server_error, success_response
 from tasks.push.worker import send_push_notification
 from utils.logger import get_logger
-from views.api.recipe_utils.match_ingredient import not_found_ingredient
+from views.api.recipe_utils.match_ingredient import not_found_ingredient, overlapping_ingredient
 
 bp_recipe = Blueprint('recipe', __name__, url_prefix='/api/recipe')
 log = get_logger()
@@ -45,7 +45,7 @@ def recipe_data(recipe_id):
     
     _ingredients = set([ i.get('name') for i in user_favorite_info.get('refrigerator', [])])
     recipe_ingred = recipe_info.get('ingred', [])
-    ingred_not_found = not_found_ingredient( recipe_ingred, _ingredients)
+    ingred_not_found = not_found_ingredient(recipe_ingred, _ingredients)
     
     
     
@@ -100,3 +100,107 @@ def bulk_recipe():
             'favorite': recipe['_id'] in user_favorite_info.get('favorite', [])
         } for recipe in recipes
     ])
+    
+@bp_recipe.get('/recommended/')
+def recommended_recipe():
+    endpoint = request.args.get('endpoint')
+    if not endpoint:
+        return incorrect_data_response('기기 정보가 없습니다'), 400
+    
+    aggregation_pipeline = [
+        {
+            '$match': {
+                'sub.endpoint': endpoint
+            }
+        },
+        {
+            '$unwind': {
+                'path': '$recommendedRecipe', 
+                'includeArrayIndex': 'string', 
+                'preserveNullAndEmptyArrays': False
+            }
+        }, {
+            '$unwind': {
+                'path': '$recommendedRecipe.ids', 
+                'includeArrayIndex': 'string', 
+                'preserveNullAndEmptyArrays': False
+            }
+        }, {
+            '$lookup': {
+                'from': 'recipe', 
+                'localField': 'recommendedRecipe.ids', 
+                'foreignField': '_id', 
+                'as': 'matchedRecipe'
+            }
+        }, {
+            '$unwind': {
+                'path': '$matchedRecipe', 
+                'preserveNullAndEmptyArrays': False
+            }
+        }, {
+            '$group': {
+                '_id': '$_id', 
+                'endpoint': {
+                    '$first': '$sub.endpoint'
+                }, 
+                'favorite': {
+                    '$first': '$favorite'
+                }, 
+                'profile': {
+                    '$first': '$profile'
+                }, 
+                'ids': {
+                    '$addToSet': '$recommendedRecipe.ids'
+                },
+                'refrigerator': {
+                    '$first': '$refrigerator'
+                },
+                'matchedRecipe': {
+                    '$addToSet': '$matchedRecipe'
+                }
+            }
+        }, {
+            '$project': {
+                'matchedRecipe.original_url': 0,
+                'matchedRecipe.description': 0,
+                'matchedRecipe.recipe': 0,
+                'matchedRecipe.soup': 0,
+                'matchedRecipe.text': 0,
+                'matchedRecipe.ingredients': 0,
+                'matchedRecipe.temp': 0,
+            }
+        }
+    ]
+    
+    try:
+        user_info: list[dict] = list(db_users.aggregate(aggregation_pipeline))
+        if not user_info or len(user_info) == 0:
+            return incorrect_data_response('사용자 정보가 없습니다'), 400
+    except PyMongoError as pe:
+        log.error(pe)
+        return server_error(), 400
+    
+    _recommended_recipe = user_info[0].get('matchedRecipe', [])
+    _favorite = user_info[0].get('favorite', [])
+    _user_ref = user_info[0].get('refrigerator', [])
+    _ingredients = set([ i.get('name') for i in _user_ref])
+    _hatelist = user_info[0].get('profile', {}).get('hate', [])
+    
+    
+    if not _recommended_recipe:
+        return incorrect_data_response('저장된 추천 레시피 없음'), 200
+    
+    return success_response('성공', data={
+        'display_list': [
+            {
+                **recipe,
+                'ingred404': not_found_ingredient(recipe.get('ingred', []), _ingredients),
+                'favorite': recipe.get('_id') in _favorite,
+            } for recipe in _recommended_recipe
+            if not overlapping_ingredient(recipe.get('ingred', []), _hatelist)
+        ],
+        'hate': _hatelist,
+    })
+    
+    
+    

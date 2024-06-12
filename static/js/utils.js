@@ -530,3 +530,98 @@ export const carouselItemsToBeAppended = async (keyword) => {
   return itemsArray;
 };
 
+
+
+const ingredientArea = (ingredients, ingredients404) => {
+    const ingredientList = createElementWithClass('div', ['ingredient-list']);
+    ingredients?.forEach(ingredient => {
+        if (ingredients404?.includes(ingredient)) {
+            ingredientList.appendChild(createElementWithClass('span', ['available-ingredient', 'missing'], ingredient));
+        } else {
+            ingredientList.appendChild(createElementWithClass('span', ['available-ingredient'], ingredient));
+        }
+        ingredientList.appendChild(createElementWithClass('span', ['ingredient-separator'], ', '));
+    });
+    return ingredientList;
+}
+
+export const createRecipeItem = (recipeData, isFavoriteView) => {
+    const isFavorite = recipeData?.favorite || false;
+    const foodImageHeader = createElementWithClass('div', ['food-image']);
+    const thumbContainer = createElementWithClass('div', ['thumb-container']);
+    const favoriteButton = createElementWithClass('button', ['star-button'], isFavorite ? '★' : '☆');
+    favoriteButton.onclick = async (e) => {
+        e.preventDefault();
+        const isFavorite = e.target.innerHTML === '★';
+        if (isFavorite) {
+            if (await deleteFavorite(recipeData?._id)) {
+                e.target.innerHTML = e.target.innerHTML === '☆' ? '★' : '☆';
+                if (isFavoriteView) {
+                    removeFadeOut(e.target.closest('.recipe-item'));
+                }
+            }
+        } else {
+            if (await setFavorite(recipeData?._id)) {
+                e.target.innerHTML = e.target.innerHTML === '☆' ? '★' : '☆';
+            }
+        }
+    }
+    thumbContainer.appendChild(favoriteButton);
+    const foodThumbnail = createElementWithClass('img');
+    foodThumbnail.src = recipeData?.image;
+    foodThumbnail.alt = recipeData?.title;
+    foodThumbnail.loading = 'lazy';
+    foodThumbnail.referrerpolicy = 'no-referrer';
+    thumbContainer.appendChild(foodThumbnail);
+    foodImageHeader.appendChild(thumbContainer);
+    const cookTime = createElementWithClass('div', ['cook-time']);
+    if (recipeData?.cook_time) {
+        cookTime.textContent = `약 ${recipeData?.cook_time}분 소요`;
+        cookTime.style.textAlign = 'center';
+    }
+    foodImageHeader.appendChild(cookTime);
+    
+    const foodHeader = createElementWithClass('div', ['food-header']);
+    const foodName = createElementWithClass('div', ['food-name'], null, recipeData?.title);
+    
+    foodHeader.appendChild(foodName);
+    
+    const ingredientList = createElementWithClass('div', ['ingredient-list']);
+    ingredientList.appendChild(ingredientArea(recipeData?.ingred, recipeData?.ingred404));
+    if (recipeData?.matchingCount) {
+        const matchingCount = createElementWithClass('div', ['matching-count'], `일치하는 재료: ${recipeData?.matchingCount}개`);
+        matchingCount.style.paddingTop = '5px';
+        ingredientList.appendChild(matchingCount);
+    }
+    
+    const foodDetails = createElementWithClass('div', ['food-details']);
+    foodDetails.appendChild(foodHeader);
+    foodDetails.appendChild(ingredientList);
+
+
+    const recipeItem = createElementWithClass('a', ['recipe-item']);
+    if (recipeData?._id) {
+        recipeItem.href = `/recipe/${recipeData?._id}`;
+        recipeItem.id = recipeData._id;
+        recipeItem.style.textDecoration = 'none';
+    }
+    recipeItem.appendChild(foodImageHeader);
+    recipeItem.appendChild(foodDetails);
+
+    return recipeItem;
+}
+
+export const requestRecommendRecipe = async () => {
+    const userEndpoint = await getSubscriptionEndpoint();
+    if (!userEndpoint) {
+        return {};
+    }
+    try {
+        const response = await fetch(`${API_DOMAIN}/api/recipe/recommended/?endpoint=${userEndpoint}`);
+        const data = await response.json();
+        return data;
+    } catch (e) {
+        console.error(e);
+        return {};
+    }
+}

@@ -31,6 +31,32 @@ def not_found_ingredient(recipe_ingredients: list[str], user_ingredients: set[st
         
     return recipe_not_found
 
+def overlapping_ingredient(recipe_ingredients: list[str], hate_list: list[str]) -> list[str]:
+    '''
+    두 리스트를 비교하여 레시피가 겹치는 것을 비교한다
+    :param recipe_ingredients: 레시피 재료 리스트
+    :param user_ingredients: 유저가 갖고 있는 재료 리스트
+    :return: 레시피에 없는 재료 리스트
+    
+    model.constant.VAGUE_INGRED_CATEGORIES를 사용하여 집합 관계의 재료 처리
+    '''
+    for ingred in recipe_ingredients:
+        ingred_splited: list[str] = ingred.split('or')
+        if any(ingred_element in hate_list for ingred_element in ingred_splited):
+            # 정확히 일치 
+            return True
+        if (
+            any(
+                ingred_element in VAGUE_INGRED_CATEGORIES.keys() and 
+                any(user_ingred in VAGUE_INGRED_CATEGORIES.get(ingred_element) for user_ingred in hate_list)
+                for ingred_element in ingred_splited
+            )
+        ): # 큰카테고리에 해당하는 재료가 재료 목록에 있고 작은 카테고리를 유저가 갖고 있을 때
+            return True
+    
+    return False        
+        
+
 
 if __name__ == '__main__':
 

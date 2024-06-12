@@ -168,7 +168,6 @@ def upload_file():
 def autocomplete_recipe_name():
     try:
         query, = parse_info_from_json(request.args, 'q')
-        query: str
     except InvalidInputError as e:
         return incorrect_data_response(str(e)), 400
     

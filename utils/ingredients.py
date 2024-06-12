@@ -2,12 +2,15 @@ from bson import ObjectId
 from pymongo.errors import PyMongoError
 from pymongo import ReturnDocument
 from datetime import datetime
+from redis.exceptions import RedisError
 
 from utils.logger import get_logger
 from db.mongo import db_users, db_recipe
 from db.redis import redis_client
 
 log = get_logger()
+
+REDIS_AUTO_COMPLETE_INDEX_KEY = '__autocomplete__ingred'
 
 class InvalidInputError(Exception):
     pass
@@ -233,12 +236,15 @@ def get_autocomplete_data(keyword: str, limit: int = 30) -> list:
     '''
     keyword: 인코딩되지 않은 문자열
     limit: 최대 반환할 데이터 개수
+    {keyword}로 시작하는 첫번째 데이터부터 {limit} 개수만큼 반환
     '''
-    start =f'[{keyword}'.encode('utf-8')
-    end = start + b'\xff'
+    lex_start =f'[{keyword}'.encode('utf-8')
+    lex_end = lex_start + b'\xff'
     try:
-        return redis_client.zrangebylex('__autocomplete__ingred', start, end, start=0, num=limit)
-    except Exception as e:
+        return redis_client.zrangebylex(
+            REDIS_AUTO_COMPLETE_INDEX_KEY, lex_start, lex_end, start=0, num=limit
+        )
+    except RedisError as e:
         log.error(e)
         return []
 
@@ -246,7 +252,7 @@ def get_autocomplete_data(keyword: str, limit: int = 30) -> list:
 def set_autocomplete_index():
     with open('./model/unique_list.txt', 'r', encoding='utf-8') as f:
         ingred: list[str] = f.readlines()
-        redis_client.zadd('__autocomplete__ingred', {
+        redis_client.zadd(REDIS_AUTO_COMPLETE_INDEX_KEY, {
             ing.encode('utf-8'): 0 for ing in ingred
         })
     
