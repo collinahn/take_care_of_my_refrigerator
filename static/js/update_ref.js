@@ -1,4 +1,4 @@
-import { getSubscriptionEndpoint, createElementWithClass, promptAlertMsg, removeFadeOut } from './utils.js';
+import { getSubscriptionEndpoint, createElementWithClass, promptAlertMsg, removeFadeOut, createRecipeItem } from './utils.js';
 
 const API_DOMAIN = 'https://myrefrigerator.store'
 // const API_DOMAIN = 'http://127.0.0.1:4000'
@@ -116,9 +116,40 @@ const onSubmitForm = async (e, type) => {
         }
         e.target.reset();
         hideBottomSheet();
+        loadUserMatchingRecipeItems();
         return
+
     }
     promptAlertMsg('warn', data.server_msg);
+}
+
+const loadUserMatchingRecipeItems = async () => {
+    const userEndpoint = await getSubscriptionEndpoint();
+    if (!userEndpoint) {
+        return
+    }
+
+    const recipeItemsArea = document.querySelector('#matchingRecipe');
+    const recipeListArea = document.querySelector('#recipeList');
+    recipeItemsArea.querySelector('#restriction').style.display = 'none';
+
+    try {
+        const response = await fetch(`${API_DOMAIN}/api/search/matching/?endpoint=${userEndpoint}`);
+        const data = await response.json();
+        if (data.resp_code === 'RET000') {
+            const recipeItems = data.data?.display_list ?? [];
+            if (recipeItems.length === 0) {
+                recipeItemsArea.appendChild(createElementWithClass('span', ['recipe-text'], null, '서버에 오류가 있습니다. 잠시 후에 만나요!'));
+                return
+            }
+            
+            recipeListArea.replaceChildren(...recipeItems.map((recipe) => createRecipeItem(recipe)));
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+
 }
 
 const loadItems = async () => {
@@ -150,6 +181,11 @@ const loadItems = async () => {
             return 0;
         });
         itemsArea.replaceChildren(...userRefrigeratorItemsArray.map((ingredient) => createIngredientItem(ingredient)));
+    }
+
+    if (userRefrigeratorItemsArray.length >= 5) {
+        loadUserMatchingRecipeItems()
+
     }
 }
 
@@ -235,7 +271,7 @@ const setAutocompleteForm = () => {
         } catch (error) {
             console.error(error);
         }
-    }, 400)
+    }, 100)
 }
 
 const setFileUpload = () => {

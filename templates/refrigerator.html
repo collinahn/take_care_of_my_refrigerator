@@ -158,6 +158,7 @@
 
 
         <link rel="stylesheet" href="/css/refrigerator.css" />
+        <link rel="stylesheet" href="/css/search.css" />
         <link rel="stylesheet" href="/css/bottom_sheet.css" />
         <link rel="stylesheet" href="/css/common.css" />
 
@@ -241,9 +242,10 @@
             <div class="popup-content">
                 <div class="box-container">
                     <button class="close" id="closePopup">✕</button>
-                    <div class="content-container">
-                        <span class="recipe-text">보유한 식재료로 바로 만들 수 있는 요리</span>
-                        <button class="recipe" id="recipeButton">확인하러 가기</button>
+                    <div class="content-container" id="matchingRecipe">
+                        <span class="recipe-text">보유한 식재료를 최대한 반영한 요리</span>
+                        <span class="recipe-text" id="restriction">5개 이상의 식재료를 추가해주세요</span>
+                        <div id="recipeList"></div>
                     </div>
                 </div>
             </div>

@@ -103,6 +103,7 @@ hr {
 .items {
     list-style: none;
     padding: 5px;
+    min-height: 40vh;
     margin-top: 0px;
 }
 
@@ -126,7 +127,7 @@ hr {
 }
 
 .popup-content {
-    margin-top: 100px;
+    margin-top: 20px;
     position: relative;
     text-align: center;
 }
@@ -135,7 +136,8 @@ hr {
     display: inline-block;
     border: none;
     background-color: rgba(66, 107, 31, 0.2);
-    padding: 0 50px;
+    padding: 0 20px;
+    margin: 0 30px;
     position: relative;
 }
 
@@ -159,6 +161,7 @@ hr {
     display: block;
     color: #426B1F;
     margin-bottom: 10px;
+    transition: all 0.3s ease-out;
 }
 
 .recipe {
@@ -311,4 +314,8 @@ footer p {
     color: #426B1F;
     font-size: 12px;
     text-align: center;
+}
+
+#recipeList .ingredient-list {
+    text-align: left;
 }

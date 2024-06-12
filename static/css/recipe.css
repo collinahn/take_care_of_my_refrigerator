@@ -12,6 +12,12 @@ header {
     align-items: center;
 }
 
+li {
+    text-wrap: wrap;
+    word-wrap:break-word;
+    word-break: break-all;
+}
+
 .logo img {
     width: 80px;
     height: auto;

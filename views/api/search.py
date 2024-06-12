@@ -174,6 +174,8 @@ def search_recipe():
 
         searched_recipe_out: list[dict[str, str]] = []
         for recipe in _searched_recipe:
+            if not recipe:
+                continue
             recipe_ingred = recipe.get('ingred', [])
             ingred_not_found = not_found_ingredient(recipe_ingred, _ingredients)
             
@@ -195,6 +197,137 @@ def search_recipe():
             'refrigerator': list(_ingredients),
             'hate': _hate,
             'nidx': cidx+ 20 if len(_searched_recipe) == 20 else -1,
+        },
+    )
+        
+    
+
+    
+
+@bp_search.get('/matching/')
+def search_matching_recipe():
+    '''
+    현재 있는 재료들을 최대한 활용할 수 있는 레시피를 검색한다
+    params
+    endpoint: 검색자의 endpoint
+    cidx: current index
+    '''
+    endpoint = request.args.get('endpoint')
+    cidx = int(request.args.get('cidx', 0))
+    
+    if not endpoint:
+        return incorrect_data_response(''), 400
+        
+    try:
+        _user_data = db_users.find_one(
+            {'sub.endpoint': endpoint},
+            {
+                'refrigerator': 1,
+                'favorite': 1,
+                'profile': 1,
+            }
+        ) or {} if endpoint else {}
+        
+        _ingredients = set([ i.get('name') for i in _user_data.get('refrigerator', [])])
+        _favorite = _user_data.get('favorite', [])
+        _hate = _user_data.get('profile', {}).get('hate', [])
+        
+   
+        # Aggregation pipeline
+        pipeline = [
+            {
+                "$match": {
+                    'ingred': {'$nin': _hate},
+                }
+            },
+            {
+                "$addFields": {
+                    "expandedIngred": {
+                        "$reduce": {
+                            "input": "$ingred",
+                            "initialValue": [],
+                            "in": {
+                                "$concatArrays": [
+                                    "$$value",
+                                    {
+                                        "$cond": {
+                                            "if": { "$regexMatch": { "input": "$$this", "regex": "or" } },
+                                            "then": { "$split": ["$$this", "or"] },
+                                            "else": ["$$this"]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            { "$unwind": "$expandedIngred" },
+            {
+                "$group": {
+                    "_id": "$_id",
+                    "menu": { "$first": "$menu" },
+                    "title": { "$first": "$title" },
+                    "image": { "$first": "$image" },
+                    "timeMins": { "$first": "$timeMins" },
+                    "ingred": { "$first": "$ingred" },
+                    "cook_time": { "$first": "$cook_time" },
+                    "portion": { "$first": "$portion" },
+                    "difficulty": { "$first": "$difficulty" },
+                    "tags": { "$first": "$tags" },
+                    "expandedIngred": { "$addToSet": "$expandedIngred" }
+                }
+            },
+            {
+                "$addFields": {
+                    "matchingCount": {
+                        "$size": {
+                            "$setIntersection": ["$expandedIngred", list(_ingredients)]
+                        }
+                    }
+                }
+            },
+            { 
+                "$sort": { 
+                    "matchingCount": -1, 
+                } 
+            },
+            {
+                "$skip": cidx
+            },
+            {
+                "$limit": 40
+            }
+        ]
+        _matched_recipe: list[dict[str, str]] = list(db_recipe.aggregate(pipeline))
+        
+        if not _matched_recipe:
+            return incorrect_data_response('no result'), 200
+        
+        searched_recipe_out: list[dict[str, str]] = []
+        for recipe in _matched_recipe:
+            if not recipe:
+                continue
+            recipe_ingred = recipe.get('ingred', [])
+            ingred_not_found = not_found_ingredient(recipe_ingred, _ingredients)
+            
+            searched_recipe_out.append({
+                **recipe,
+                'favorite': recipe.get('_id') in _favorite,
+                'ingred404': ingred_not_found,
+            })
+        
+        
+    except PyMongoError as pe:
+        log.error(pe)
+        return server_error('잠시 후 다시 이용해주세요'), 500
+        
+    return success_response(
+        data={
+            'display_list': searched_recipe_out,
+            'refrigerator': list(_ingredients),
+            'hate': _hate,
+            'nidx': cidx+ 20 if len(_matched_recipe) == 20 else -1,
         },
     )
         
