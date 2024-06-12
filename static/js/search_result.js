@@ -195,6 +195,20 @@ const getLastKeys = (ingredients) => {
 
     return lastKeys;
 }
+
+const ingredientArea = (ingredients, ingredients404) => {
+    const ingredientList = createElementWithClass('div', ['ingredient-list']);
+    ingredients?.forEach(ingredient => {
+        if (ingredients404?.includes(ingredient)) {
+            ingredientList.appendChild(createElementWithClass('span', ['available-ingredient', 'missing'], ingredient));
+        } else {
+            ingredientList.appendChild(createElementWithClass('span', ['available-ingredient'], ingredient));
+        }
+        ingredientList.appendChild(createElementWithClass('span', ['ingredient-separator'], ', '));
+    });
+    return ingredientList;
+}
+
 const createRecipeItem = (recipeData, isFavoriteView) => {
     const isFavorite = recipeData?.favorite || false;
     const foodImageHeader = createElementWithClass('div', ['food-image']);
@@ -237,13 +251,20 @@ const createRecipeItem = (recipeData, isFavoriteView) => {
     foodHeader.appendChild(foodName);
     
     const ingredientList = createElementWithClass('div', ['ingredient-list']);
-    const noIngredient = createElementWithClass('div', ['no-ingredient'], `없는 재료: ${recipeData?.ingred404?.join(', ')}`);
-    const availableIngredient = createElementWithClass('div', ['available-ingredient'], recipeData?.ingred?.join(', '));
+    // const noIngredient = createElementWithClass('div', ['no-ingredient'], `없는 재료: ${recipeData?.ingred404?.join(', ')}`);
+    // const availableIngredient = createElementWithClass('div', ['available-ingredient'], recipeData?.ingred?.join(', '));
+
     
-    if (recipeData?.ingred404?.length > 0) {
-        ingredientList.appendChild(noIngredient);
+    // if (recipeData?.ingred404?.length > 0) {
+    //     ingredientList.appendChild(noIngredient);
+    // }
+    // ingredientList.appendChild(availableIngredient);
+    ingredientList.appendChild(ingredientArea(recipeData?.ingred, recipeData?.ingred404));
+    if (recipeData?.matchingCount) {
+        const matchingCount = createElementWithClass('div', ['matching-count'], `일치하는 재료: ${recipeData?.matchingCount}개`);
+        matchingCount.style.paddingTop = '5px';
+        ingredientList.appendChild(matchingCount);
     }
-    ingredientList.appendChild(availableIngredient);
     
     const foodDetails = createElementWithClass('div', ['food-details']);
     foodDetails.appendChild(foodHeader);

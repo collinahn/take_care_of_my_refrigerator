@@ -55,6 +55,10 @@ hr {
     margin: 0 53px;
 }
 
+.missing {
+    color: tomato
+}
+
 .content-box {
     display: none;
     flex-direction: column;
