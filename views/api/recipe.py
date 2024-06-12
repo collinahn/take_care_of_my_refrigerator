@@ -181,7 +181,7 @@ def recommended_recipe():
         return server_error(), 400
     
     _recommended_recipe = user_info[0].get('matchedRecipe', [])
-    _favorite = user_info[0].get('favorite', [])
+    _favorite = user_info[0].get('favorite', []) or []
     _user_ref = user_info[0].get('refrigerator', [])
     _ingredients = set([ i.get('name') for i in _user_ref])
     _hatelist = user_info[0].get('profile', {}).get('hate', [])

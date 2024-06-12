@@ -125,7 +125,9 @@ const onSubmitForm = async (e, type) => {
         }
         e.target.reset();
         hideBottomSheet();
-        loadUserMatchingRecipeItems();
+        if (userRefrigeratorItemsArray.length >= 5) {
+            loadUserMatchingRecipeItems();
+        }
         return
 
     }
