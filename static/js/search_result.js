@@ -83,11 +83,7 @@ const getFavorites = async () => {
             resultArea.style.alignContent = 'center';
             return;
         }
-
-        recipeData.forEach((recipe) => {
-            const recipeItem = createRecipeItem(recipe, true);
-            resultArea.appendChild(recipeItem);
-        });
+        resultArea.replaceChildren(...recipeData.map(createRecipeItem));
     } else {
         promptAlertMsg('warn', respJson?.server_msg || '검색 결과를 가져오는데 실패했습니다.');
     }
@@ -121,10 +117,7 @@ const getRecentViews = async () => {
             const bId = b._id;
             return  viewedRecipes.indexOf(aId) - viewedRecipes.indexOf(bId);
         });
-        recipeData.forEach((recipe) => {
-            const recipeItem = createRecentRecipe(recipe);
-            resultArea.appendChild(recipeItem);
-        });
+        resultArea.replaceChildren(...recipeData.map(createRecentRecipe));
     } else {
         promptAlertMsg('warn', respJson?.server_msg || '검색 결과를 가져오는데 실패했습니다.');
     }

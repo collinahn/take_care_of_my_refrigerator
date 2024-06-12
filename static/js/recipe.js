@@ -181,7 +181,7 @@ const getSearchResult = async (formData) => {
                 innerText: '이번 요리에서 남은 재료를 선택 해제해주세요'
             })
             bottomSheetBody.appendChild(titleH3);
-            const formElem = createElementWithClassV2('form', [], {
+            const formElem = createElementWithClassV2('form', ['delete-ingred'], {
                 onsubmit: async (e) => {
                     e.preventDefault();
                     const formData = new FormData(e.target);
@@ -230,7 +230,7 @@ const getSearchResult = async (formData) => {
             formElem.appendChild(checkboxContainer);
             const submitButton = createElementWithClassV2('button', ['submit'], {
                 type: 'submit',
-                innerText: '선택된 재료를 냉장고에서 삭제합니다.'
+                innerText: '선택된 재료를 냉장고에서 삭제하기'
             });
             formElem.appendChild(submitButton);
             bottomSheetBody.appendChild(formElem);

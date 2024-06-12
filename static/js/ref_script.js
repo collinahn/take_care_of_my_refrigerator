@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const noItem = document.createElement('li');
             noItem.id = 'noItem';
             noItem.classList.add('item');
-            noItem.textContent = `${category} 보관에 해당하는 아이템이 없습니다.`;
+            noItem.textContent = `${category} 보관에 해당하는 재료가 없습니다.`;
             document.querySelector('.items').appendChild(noItem);
         } else {
             if (document.querySelector('#noItem')) {

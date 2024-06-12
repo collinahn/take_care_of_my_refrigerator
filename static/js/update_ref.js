@@ -168,7 +168,7 @@ const loadItems = async () => {
 
     if (!userEndpoint) {
         promptAlertMsg('warn', '홈 화면에서 알림 아이콘을 눌러 기기등록을 먼저 진행해주세요.');
-        document.querySelector('.items').replaceChildren(createElementWithClass('li', ['item'], null, '기기 등록 전엔 냉장고 서비스 이용이 불가합니다.'));
+        document.querySelector('.items').replaceChildren(createElementWithClass('li', ['item'], null, '기기 등록 후에 냉장고 서비스 이용이 가능합니다.<br>홈 화면의 알림 아이콘을 눌러 진행해주세요.'));
         return
     }
 
