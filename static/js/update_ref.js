@@ -247,6 +247,12 @@ const setFileUpload = () => {
     });
 
     fileInput.addEventListener('change', async (event) => {
+        const userEndpoint = await getSubscriptionEndpoint();
+        if (!userEndpoint) {
+            promptAlertMsg('warn', '홈 화면에서 알림 아이콘을 눌러 기기등록을 먼저 진행해주세요.');
+            return
+        }
+
         let intervalCounter = 0;
         let loadingInterval = null;
         const file = event.target.files[0];
@@ -266,7 +272,9 @@ const setFileUpload = () => {
 
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('endpoint', await getSubscriptionEndpoint());
+            if (userEndpoint){
+                formData.append('endpoint', userEndpoint);
+            }
 
             try {
                 const response = await fetch(`${API_DOMAIN}${UPLOAD_API_ENDPOINT}`, {
