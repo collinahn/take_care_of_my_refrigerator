@@ -87,12 +87,12 @@ hr {
     height: 30px;
     width: 30px;
     font-size: 20px;
-    line-height: 30px; /* 버튼의 높이와 동일하게 설정하여 텍스트를 중앙에 맞춥니다 */
-    padding: 0; /* 기본 패딩 제거 */
-    margin: 0; /* 기본 마진 제거 */
-    display: flex; /* 플렉스 박스 사용 */
-    align-items: center; /* 수직 중앙 정렬 */
-    justify-content: center; /* 수평 중앙 정렬 */
+    line-height: 30px;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .add:hover {
@@ -233,9 +233,12 @@ hr {
 
 .add-item-sheet .body {
     margin-top: 10px;
-    width: 100%
+    max-width: 100%;
     padding: 0 10px;
     box-sizing: border-box; 
+    position: fixed;
+    left: 0;
+    right: 0;
 }
 
 .add-item-sheet .body .form-row {
