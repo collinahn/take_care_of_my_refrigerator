@@ -154,7 +154,7 @@ def search_recipe():
             return incorrect_data_response('검색 결과가 없습니다'), 404
         
         if endpoint:
-            if keyword:
+            if keyword and not cidx:
                 create_recommended_recipe.delay(endpoint, keyword)
             db_users.update_one(
                 {'sub.endpoint': endpoint},

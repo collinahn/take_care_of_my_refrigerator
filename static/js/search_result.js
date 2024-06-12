@@ -116,7 +116,6 @@ const addSeeMoreButtonRecursive = (formData) => {
     }, 1500);
     seeMoreButton.onclick = () => {
         getSearchResult(formData);
-        addSeeMoreButtonRecursive(formData);
         removeFadeOut(seeMoreButton);
     }
 
