@@ -3,7 +3,8 @@ getSubscriptionEndpoint,
 getCurrentId,
 setFavorite,
 deleteFavorite,
-carouselItemsToBeAppended,
+updateBanner,
+getRecommendList,
 createElementWithClassV2,
 promptAlertMsg
 } from "./utils.js";
@@ -263,30 +264,7 @@ const updateViewedRecipes = () => {
     localStorage.setItem(storageKey, JSON.stringify(viewedRecipes));
 }
 
-const updateBanner = async (keyword) =>{
-    const recommendArea = document.querySelector('#carouselRecommend');
-    recommendArea.replaceChildren();
-    const bannerItems = await carouselItemsToBeAppended(keyword)
-    recommendArea.replaceChildren(...bannerItems);
-}
 
-const getRecommendList = async () => {
-    try {
-        await updateBanner()
-
-        const formKeywordInput = document.querySelector('#formKeywordInput');
-        formKeywordInput.onsubmit = async (e) => {
-            e.preventDefault();
-            formKeywordInput.querySelector('input[type="search"]').blur();
-            formKeywordInput.querySelectorAll('input[type="radio"]').forEach(radio => {
-                radio.checked = false;
-            })
-            await updateBanner(formKeywordInput.querySelector('input[type="search"]').value)
-        }
-    } catch (e) {
-        console.error(e);
-    }
-}
 
 document.addEventListener('DOMContentLoaded', function() {
     getSearchResult();

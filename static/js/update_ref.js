@@ -1,4 +1,13 @@
-import { getSubscriptionEndpoint, createElementWithClass, promptAlertMsg, removeFadeOut, createRecipeItem } from './utils.js';
+import { 
+    getSubscriptionEndpoint, 
+    createElementWithClass, 
+    createElementWithClassV2,
+    promptAlertMsg, 
+    removeFadeOut, 
+    updateBanner,
+    getRecommendList,
+    createRecipeItem 
+} from './utils.js';
 
 const API_DOMAIN = 'https://myrefrigerator.store'
 // const API_DOMAIN = 'http://127.0.0.1:4000'
@@ -131,7 +140,6 @@ const loadUserMatchingRecipeItems = async () => {
 
     const recipeItemsArea = document.querySelector('#matchingRecipe');
     const recipeListArea = document.querySelector('#recipeList');
-    recipeItemsArea.querySelector('#restriction').style.display = 'none';
 
     try {
         const response = await fetch(`${API_DOMAIN}/api/search/matching/?endpoint=${userEndpoint}`);
@@ -144,7 +152,9 @@ const loadUserMatchingRecipeItems = async () => {
             }
             
             recipeListArea.replaceChildren(...recipeItems.map((recipe) => createRecipeItem(recipe)));
+            
         }
+        recipeItemsArea.querySelector('#restriction').style.display = 'none';
 
     } catch (error) {
         console.log(error);
@@ -382,6 +392,14 @@ if (addItemButton) {
 
     loadItems();
     setAutocompleteForm();
-    setFileUpload()
+    setFileUpload();
+    getRecommendList();
+    const formKeywordInput = document.getElementById('formKeywordInput');
+    formKeywordInput.appendChild(
+    createElementWithClassV2('input', [], {
+        type: 'search',
+        placeholder: '검색어를 입력하세요',
+        id: 'keyboardInput',
+    }))
 
 });

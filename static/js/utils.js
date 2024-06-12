@@ -639,3 +639,30 @@ export const setUpRecommendRecipe = async (displayArea) => {
     });
 
 }
+
+export const updateBanner = async (keyword) =>{
+    const recommendArea = document.querySelector('#carouselRecommend');
+    recommendArea.replaceChildren();
+    const bannerItems = await carouselItemsToBeAppended(keyword)
+    recommendArea.replaceChildren(...bannerItems);
+}
+
+export const getRecommendList = async () => {
+
+    try {
+        await updateBanner()
+
+        const formKeywordInput = document.querySelector('#formKeywordInput');
+        
+        formKeywordInput.onsubmit = async (e) => {
+            e.preventDefault();
+            formKeywordInput.querySelector('input[type="search"]').blur();
+            formKeywordInput.querySelectorAll('input[type="radio"]')?.forEach(radio => {
+                radio.checked = false;
+            })
+            await updateBanner(formKeywordInput.querySelector('input[type="search"]').value)
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}

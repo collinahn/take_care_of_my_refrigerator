@@ -103,7 +103,7 @@ hr {
 .items {
     list-style: none;
     padding: 5px;
-    min-height: 40vh;
+    min-height: 20vh;
     margin-top: 0px;
 }
 
