@@ -55,7 +55,7 @@ main {
 }
 
 hr {
-    margin: 0 53px;
+    margin: 0 40px;
 }
 
 .missing {
@@ -169,7 +169,10 @@ p {
 .filter select {
     padding: 5px 10px;
     margin-right: 10px;
+    font-size: medium;
+    background-color: rgba(66, 107, 31, 0.3);
     border: none;
+    border-radius: 0;
 }
 
 .search img {

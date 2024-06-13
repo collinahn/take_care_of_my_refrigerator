@@ -58,7 +58,7 @@ main {
 }
 
 hr {
-    margin: 0 42px;
+    margin: 0 40px;
 }
 
 .content {
@@ -69,7 +69,7 @@ hr {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 0 10px;
+    margin: 5px 10px;
     font-size: 16px;
     border: none;
 }
@@ -77,11 +77,13 @@ hr {
 .filter label,
 .filter select {
     display: inline-block;
+
 }
 
 #filter {
     font-size: 16px;
     border: none;
+    border-radius: 0
 }
 
 .content .add {
